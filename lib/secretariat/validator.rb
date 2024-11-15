@@ -20,12 +20,12 @@ module Secretariat
   class Validator
     SCHEMATRON = [
       "../../schemas/zugferd_1/ZUGFeRD1p0.sch",
-      "../../schemas/zugferd_2/Factur-X_1.0.07_EN16931.sch"
+      "../../schemas/zugferd_2/Factur-X_1.07.2_EN16931.sch"
     ]
 
     SCHEMA = [
       "../../schemas/zugferd_1/ZUGFeRD1p0.xsd",
-      "../../schemas/zugferd_2/Factur-X_1.0.07_EN16931.xsd"
+      "../../schemas/zugferd_2/Factur-X_1.07.2_EN16931.xsd"
     ]
 
     SCHEMA_DIR = [
