@@ -73,7 +73,7 @@ module Secretariat
       @errors = []
       tax = BigDecimal(tax_amount)
       basis = BigDecimal(basis_amount)
-      calc_tax = basis * BigDecimal(tax_percent) / BigDecimal("100")
+      calc_tax = basis * BigDecimal(tax_percent) / BigDecimal(100)
       calc_tax = calc_tax.round(2)
       if tax != calc_tax
         @errors << "Tax amount and calculated tax amount deviate: #{tax} / #{calc_tax}"
@@ -85,7 +85,7 @@ module Secretariat
         @errors << "Grand total amount and calculated grand total amount deviate: #{grand_total} / #{calc_grand_total}"
         return false
       end
-      line_item_sum = line_items.inject(BigDecimal("0")) do |m, item|
+      line_item_sum = line_items.inject(BigDecimal(0)) do |m, item|
         m + BigDecimal(item.charge_amount)
       end
       if line_item_sum != basis
@@ -306,12 +306,12 @@ module Secretariat
                 Helpers.currency_element(xml, "ram", "LineTotalAmount", basis_amount, currency_code, add_currency: version == 1)
                 # TODO: Fix this!
                 # Zuschuesse
-                unless BigDecimal("0").to_f.zero?
-                  Helpers.currency_element(xml, "ram", "ChargeTotalAmount", BigDecimal("0"), currency_code, add_currency: version == 1)
+                unless BigDecimal(0).to_f.zero?
+                  Helpers.currency_element(xml, "ram", "ChargeTotalAmount", BigDecimal(0), currency_code, add_currency: version == 1)
                 end
                 # Rabatte
-                unless BigDecimal("0").to_f.zero?
-                  Helpers.currency_element(xml, "ram", "AllowanceTotalAmount", BigDecimal("0"), currency_code, add_currency: version == 1)
+                unless BigDecimal(0).to_f.zero?
+                  Helpers.currency_element(xml, "ram", "AllowanceTotalAmount", BigDecimal(0), currency_code, add_currency: version == 1)
                 end
                 Helpers.currency_element(xml, "ram", "TaxBasisTotalAmount", basis_amount, currency_code, add_currency: version == 1)
                 unless tax_amount.to_f.zero?

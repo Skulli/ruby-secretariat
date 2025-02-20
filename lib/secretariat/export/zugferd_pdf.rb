@@ -13,7 +13,7 @@ module Secretariat
 
         # @@logger ||= Logger.new(File.join(log_directory, "export.log"))
 
-        @@logger ||= Logger.new(STDOUT)
+        @@logger ||= Logger.new($stdout)
       end
 
       def self.convert_a1_to_a3_params(pdf_a1, output_file_path)
