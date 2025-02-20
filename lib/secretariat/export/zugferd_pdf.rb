@@ -5,7 +5,8 @@ module Secretariat
       require "logger"
       require "open3"
 
-      JAR_PATH = Secretariat.file_path("/lib/secretariat/export/bin/jar/Mustang-CLI-2.11.0.jar")
+      # https://github.com/ZUGFeRD/mustangproject/releases
+      JAR_PATH = Secretariat.file_path("/lib/secretariat/export/bin/jar/Mustang-CLI-2.16.2.jar")
 
       def self.logger
         # log_directory = File.expand_path("../../../../log", __FILE__)
