@@ -33,11 +33,12 @@ module Secretariat
 
         stdout, stderr, status = Open3.capture3(command)
 
+        logger.error("Standard output: #{stdout}")
+
         if status.success?
           logger.info("Command executed successfully")
         else
           logger.error("Command failed with error: #{stderr}")
-          logger.error("Standard output: #{stdout}")
         end
 
         status.success?
