@@ -83,8 +83,8 @@ module Secretariat
         rescue => e
           logger.error("Error during file combination: #{e.message}")
           raise e
-        ensure
-          File.delete(output_file_path) if output_dir == Dir.tmpdir && File.exist?(output_file_path)
+        #ensure
+        #  File.delete(output_file_path) if output_dir == Dir.tmpdir && File.exist?(output_file_path)
         end
       end
 
