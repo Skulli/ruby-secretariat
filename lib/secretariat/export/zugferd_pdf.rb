@@ -8,10 +8,12 @@ module Secretariat
       JAR_PATH = Secretariat.file_path("/lib/secretariat/export/bin/jar/Mustang-CLI-2.11.0.jar")
 
       def self.logger
-        log_directory = File.expand_path("../../../../log", __FILE__)
-        FileUtils.mkdir_p(log_directory) unless Dir.exist?(log_directory)
+        # log_directory = File.expand_path("../../../../log", __FILE__)
+        # FileUtils.mkdir_p(log_directory) unless Dir.exist?(log_directory)
 
-        @@logger ||= Logger.new(File.join(log_directory, "export.log"))
+        # @@logger ||= Logger.new(File.join(log_directory, "export.log"))
+
+        @@logger ||= Logger.new(STDOUT)
       end
 
       def self.convert_a1_to_a3_params(pdf_a1, output_file_path)
@@ -26,6 +28,7 @@ module Secretariat
         command = "java -Xmx1G -Dfile.encoding=UTF-8 -jar #{JAR_PATH} #{params}"
 
         logger.info("Executing command: #{command}")
+        puts "Executing command: #{command}"
 
         stdout, stderr, status = Open3.capture3(command)
 
