@@ -20,13 +20,24 @@ RSpec.describe Secretariat::Validator do
     }
   end
 
-  context "zugpferd1 schema extended" do
-    let(:xml) { File.open(Secretariat.file_path("spec/fixtures/zugferd_1/einfach.xml")) }
-    subject { described_class.new(xml, version: 1) }
+  describe "zugpferd1 schema extended" do
+    context "valid" do
+      let(:xml) { File.open(Secretariat.file_path("spec/fixtures/zugferd_1/einfach.xml")) }
+      subject { described_class.new(xml, version: 1) }
 
-    it {
-      expect(subject.validate_against_schema).to be_empty
-    }
+      it {
+        expect(subject.validate_against_schema).to be_empty
+      }
+    end
+
+    context "invalid" do
+      let(:xml) { File.open(Secretariat.file_path("spec/fixtures/zugferd_1/invalid.xml")) }
+      subject { described_class.new(xml, version: 1) }
+
+      it {
+        expect(subject.validate_against_schema).not_to be_empty
+      }
+    end
   end
 
   context "zugpferd1 schematron extended" do
