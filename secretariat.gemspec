@@ -30,4 +30,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rspec", "~> 3.0"
   s.add_development_dependency "standard"
+  s.add_development_dependency "bigdecimal"
 end
