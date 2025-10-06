@@ -19,7 +19,7 @@ module Secretariat
     keyword_init: true) do
     def to_xml(xml, exclude_tax: false, version: 2)
       if trade_party_id.to_s != ""
-        xml["ram"].Name trade_party_id
+        xml["ram"].ID trade_party_id
       end
       xml["ram"].Name name
       if registration_number.to_s != ""
