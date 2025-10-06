@@ -288,8 +288,10 @@ module Secretariat
                 end
               end
               xml["ram"].SpecifiedTradePaymentTerms do
-                if payment_status == "unpaid"
-                  xml["ram"].Description payment_description
+                if payment_status == "unpaid" || (payment_status.to_s == "")
+                  if payment_description.to_s != ""
+                    xml["ram"].Description payment_description
+                  end
                   xml["ram"].DueDateDateTime do
                     xml["udt"].DateTimeString(format: "102") do
                       xml.text(payment_due_date&.strftime("%Y%m%d"))
