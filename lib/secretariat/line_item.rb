@@ -94,11 +94,6 @@ module Secretariat
         xml["ram"].AssociatedDocumentLineDocument do
           xml["ram"].LineID line_item_index
         end
-        if invoice_text.to_s != ""
-          xml["ram"].IncludedNote {
-            xml["ram"].Content invoice_text
-          }
-        end
         if version >= 2
           xml["ram"].SpecifiedTradeProduct do
             if buyer_id.to_s != ""
@@ -112,6 +107,11 @@ module Secretariat
               xml["ram"].ID origin_country_code
             end
           end
+        end
+        if invoice_text.to_s != ""
+          xml["ram"].IncludedNote {
+            xml["ram"].Content invoice_text
+          }
         end
         agreement = by_version(version, "SpecifiedSupplyChainTradeAgreement", "SpecifiedLineTradeAgreement")
 
