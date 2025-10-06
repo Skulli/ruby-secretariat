@@ -6,6 +6,7 @@
 /pkg/
 /spec/reports/
 /tmp/
+/.vscode/
 .DS_STORE
 
 # rspec failure tracking
