@@ -143,11 +143,24 @@ module Secretariat
               end
             end
             xml["ram"].GuidelineSpecifiedDocumentContextParameter do
-              version_id = by_version(version, "urn:ferd:CrossIndustryDocument:invoice:1p0:comfort", "urn:cen.eu:en16931:2017")
-              if mode == :xrechnung
-                version_id += "#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3" if version == 2
-                version_id += "#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0" if version == 3
-              end
+              version_id =
+                if mode == :zugferd
+                  # Für ZUGFeRD / Factur-X
+                  "urn:fdc:factur-x.eu:1p0:en16931:compliant:zugferd"
+                elsif mode == :xrechnung
+                  # Für XRechnung
+                  case version.to_s
+                  when /^2/
+                    "urn:cen.eu:en16931:2017#compliant#urn:fdc:gov.de:xrechnung_2.3"
+                  when /^3/
+                    "urn:cen.eu:en16931:2017#compliant#urn:fdc:gov.de:xrechnung_3.0"
+                  else
+                    "urn:cen.eu:en16931:2017"
+                  end
+                else
+                  # Fallback auf neutrale EN16931
+                  "urn:cen.eu:en16931:2017"
+                end
               xml["ram"].ID version_id
             end
           end
