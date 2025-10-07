@@ -42,7 +42,7 @@ module Secretariat
           end
           if contact_email.to_s != ""
             xml["ram"].EmailURIUniversalCommunication do
-              xml["ram"].URIID contact_email
+              xml["ram"].URIID(contact_email, schemeID: "EM")
             end
           end
         end
