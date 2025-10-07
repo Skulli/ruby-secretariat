@@ -144,10 +144,7 @@ module Secretariat
             end
             xml["ram"].GuidelineSpecifiedDocumentContextParameter do
               version_id =
-                if mode == :zugferd
-                  # Für ZUGFeRD / Factur-X
-                  "urn:factur-x.eu:2p3:en16931:comfort"
-                elsif mode == :xrechnung
+                if mode == :xrechnung
                   # Für XRechnung
                   case version.to_s
                   when /^2/
