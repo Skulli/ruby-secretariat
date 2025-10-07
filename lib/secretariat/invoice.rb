@@ -146,7 +146,7 @@ module Secretariat
               version_id =
                 if mode == :zugferd
                   # Für ZUGFeRD / Factur-X
-                  "urn:fdc:factur-x.eu:1p0:en16931:compliant:zugferd"
+                  "urn:factur-x.eu:2p3:en16931:comfort"
                 elsif mode == :xrechnung
                   # Für XRechnung
                   case version.to_s
