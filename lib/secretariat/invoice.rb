@@ -334,6 +334,10 @@ module Secretariat
           end
         end
       end
+      # entferne leere Knoten
+      builder.doc.traverse do |node|
+        node.remove if node.element? && node.text == ""
+      end
       builder.to_xml
     end
   end
