@@ -137,7 +137,7 @@ module Secretariat
           context = by_version(version, "SpecifiedExchangedDocumentContext", "ExchangedDocumentContext")
 
           xml["rsm"].send(context) do
-            if version == 3 && mode == :xrechnung
+            if (version == 3 && mode == :xrechnung) || (version >= 2 && mode == :zugferd)
               xml["ram"].BusinessProcessSpecifiedDocumentContextParameter do
                 xml["ram"].ID "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0"
               end
