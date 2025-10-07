@@ -41,6 +41,9 @@ RSpec.describe Secretariat::Export::ZugferdPdf, type: :module do
 
       expect(result).to eq(output_file_path2)
       expect(File.exist?(result)).to be(true)
+
+      validate = described_class.validate_zugerd_pdf(output_file_path2)
+      expect(validate).to be(false)
     end
 
     after do

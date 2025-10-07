@@ -88,6 +88,10 @@ module Secretariat
         end
       end
 
+      def self.validate_zugerd_pdf(file_path)
+        call_jar("--action validate --source #{file_path} --format zf --version 2 --profile E")
+      end
+
       def self.output_filename_with_suffix(source_file, suffix)
         ext = File.extname(source_file)
         File.basename(source_file, ext) + suffix + ext
