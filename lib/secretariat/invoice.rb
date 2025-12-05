@@ -145,17 +145,22 @@ module Secretariat
             xml["ram"].GuidelineSpecifiedDocumentContextParameter do
               version_id =
                 if mode == :xrechnung
-                  # Für XRechnung
                   case version.to_s
-                  when /^2/
-                    "urn:cen.eu:en16931:2017#compliant#urn:fdc:gov.de:xrechnung_2.3"
                   when /^3/
-                    "urn:cen.eu:en16931:2017#compliant#urn:fdc:gov.de:xrechnung_3.0"
+                    # XRechnung 3.0 (Aktuelle Version, seit Feb 2024)
+                    "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_3.0"
+                  when /^2\.3/
+                    # XRechnung 2.3 (Abgelöst, aber oft noch akzeptiert)
+                    "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3"
+                  when /^2/ # Fängt 2.0, 2.1, 2.2 auf
+                    # XRechnung 2.x (Nutzt die älteste, aber gängige ID 2.2 als Default)
+                    "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.2"
                   else
+                    # Fallback auf generische EN16931, falls die Version nicht erkannt wird
                     "urn:cen.eu:en16931:2017"
                   end
                 else
-                  # Fallback auf neutrale EN16931
+                  # Fallback auf neutrale EN16931 (für ZUGFeRD EN16931/Comfort/Basic)
                   "urn:cen.eu:en16931:2017"
                 end
               xml["ram"].ID version_id
