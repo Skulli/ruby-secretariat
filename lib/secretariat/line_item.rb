@@ -108,11 +108,6 @@ module Secretariat
             end
           end
         end
-        if invoice_text.to_s != ""
-          xml["ram"].IncludedNote {
-            xml["ram"].Content invoice_text
-          }
-        end
         agreement = by_version(version, "SpecifiedSupplyChainTradeAgreement", "SpecifiedLineTradeAgreement")
 
         xml["ram"].send(agreement) do
@@ -150,6 +145,11 @@ module Secretariat
           end
         end
 
+        if invoice_text.to_s != ""
+          xml["ram"].IncludedNote {
+            xml["ram"].Content invoice_text
+          }
+        end
         delivery = by_version(version, "SpecifiedSupplyChainTradeDelivery", "SpecifiedLineTradeDelivery")
 
         xml["ram"].send(delivery) do
