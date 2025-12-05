@@ -35,11 +35,11 @@ module Secretariat
               xml["ram"].CompleteNumber contact_phone
             end
           end
-          if contact_fax.to_s != ""
-            xml["ram"].FaxUniversalCommunication do
-              xml["ram"].CompleteNumber contact_fax
-            end
-          end
+          # if contact_fax.to_s != ""
+          #   xml["ram"].FaxUniversalCommunication do
+          #     xml["ram"].CompleteNumber contact_fax
+          #   end
+          # end
           if contact_email.to_s != ""
             xml["ram"].EmailURIUniversalCommunication do
               xml["ram"].URIID(contact_email, schemeID: "EM")
