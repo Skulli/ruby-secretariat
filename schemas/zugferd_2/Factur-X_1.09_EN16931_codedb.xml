@@ -45,6 +45,13 @@
     <enumeration value="456"/>
     <enumeration value="457"/>
     <enumeration value="458"/>
+    <enumeration value="471"/>
+    <enumeration value="472"/>
+    <enumeration value="473"/>
+    <enumeration value="500"/>
+    <enumeration value="501"/>
+    <enumeration value="502"/>
+    <enumeration value="503"/>
     <enumeration value="527"/>
     <enumeration value="532"/>
     <enumeration value="553"/>
@@ -702,6 +709,14 @@
     <enumeration value="0238"/>
     <enumeration value="0239"/>
     <enumeration value="0240"/>
+    <enumeration value="0241"/>
+    <enumeration value="0242"/>
+    <enumeration value="0243"/>
+    <enumeration value="0244"/>
+    <enumeration value="0245"/>
+    <enumeration value="0246"/>
+    <enumeration value="0247"/>
+    <enumeration value="0248"/>
   </cl>
   <cl id="6">
     <enumeration value="AA"/>
@@ -891,6 +906,7 @@
     <enumeration value="ZZZ"/>
   </cl>
   <cl id="7">
+    <enumeration value="1A"/>
     <enumeration value="AD"/>
     <enumeration value="AE"/>
     <enumeration value="AF"/>
@@ -1135,6 +1151,7 @@
     <enumeration value="VU"/>
     <enumeration value="WF"/>
     <enumeration value="WS"/>
+    <enumeration value="XI"/>
     <enumeration value="YE"/>
     <enumeration value="YT"/>
     <enumeration value="ZA"/>
@@ -4142,6 +4159,7 @@
     <enumeration value="AXQ"/>
     <enumeration value="AXR"/>
     <enumeration value="AXS"/>
+    <enumeration value="AXU"/>
     <enumeration value="BA"/>
     <enumeration value="BC"/>
     <enumeration value="BD"/>
@@ -4819,6 +4837,14 @@
     <enumeration value="0238"/>
     <enumeration value="0239"/>
     <enumeration value="0240"/>
+    <enumeration value="0241"/>
+    <enumeration value="0242"/>
+    <enumeration value="0243"/>
+    <enumeration value="0244"/>
+    <enumeration value="0245"/>
+    <enumeration value="0246"/>
+    <enumeration value="0247"/>
+    <enumeration value="0248"/>
   </cl>
   <cl id="17">
     <enumeration value="0002"/>
@@ -4872,6 +4898,11 @@
     <enumeration value="0230"/>
     <enumeration value="0235"/>
     <enumeration value="0240"/>
+    <enumeration value="0242"/>
+    <enumeration value="0244"/>
+    <enumeration value="0245"/>
+    <enumeration value="0246"/>
+    <enumeration value="0248"/>
     <enumeration value="9910"/>
     <enumeration value="9913"/>
     <enumeration value="9914"/>
@@ -4947,7 +4978,6 @@
     <enumeration value="AFN"/>
     <enumeration value="ALL"/>
     <enumeration value="AMD"/>
-    <enumeration value="ANG"/>
     <enumeration value="AOA"/>
     <enumeration value="ARS"/>
     <enumeration value="AUD"/>
@@ -4956,7 +4986,6 @@
     <enumeration value="BAM"/>
     <enumeration value="BBD"/>
     <enumeration value="BDT"/>
-    <enumeration value="BGN"/>
     <enumeration value="BHD"/>
     <enumeration value="BIF"/>
     <enumeration value="BMD"/>
@@ -4976,6 +5005,7 @@
     <enumeration value="CHW"/>
     <enumeration value="CLF"/>
     <enumeration value="CLP"/>
+    <enumeration value="CNH"/>
     <enumeration value="CNY"/>
     <enumeration value="COP"/>
     <enumeration value="COU"/>
@@ -5108,6 +5138,7 @@
     <enumeration value="XBC"/>
     <enumeration value="XBD"/>
     <enumeration value="XCD"/>
+    <enumeration value="XCG"/>
     <enumeration value="XDR"/>
     <enumeration value="XOF"/>
     <enumeration value="XPD"/>
@@ -5227,6 +5258,7 @@
     <enumeration value="VATEX-EU-132-1O"/>
     <enumeration value="VATEX-EU-132-1P"/>
     <enumeration value="VATEX-EU-132-1Q"/>
+    <enumeration value="VATEX-EU-135-1"/>
     <enumeration value="VATEX-EU-143"/>
     <enumeration value="VATEX-EU-143-1A"/>
     <enumeration value="VATEX-EU-143-1B"/>
@@ -5511,7 +5543,6 @@
     <enumeration value="AFN"/>
     <enumeration value="ALL"/>
     <enumeration value="AMD"/>
-    <enumeration value="ANG"/>
     <enumeration value="AOA"/>
     <enumeration value="ARS"/>
     <enumeration value="AUD"/>
@@ -5520,7 +5551,6 @@
     <enumeration value="BAM"/>
     <enumeration value="BBD"/>
     <enumeration value="BDT"/>
-    <enumeration value="BGN"/>
     <enumeration value="BHD"/>
     <enumeration value="BIF"/>
     <enumeration value="BMD"/>
@@ -5540,6 +5570,7 @@
     <enumeration value="CHW"/>
     <enumeration value="CLF"/>
     <enumeration value="CLP"/>
+    <enumeration value="CNH"/>
     <enumeration value="CNY"/>
     <enumeration value="COP"/>
     <enumeration value="COU"/>
@@ -5672,6 +5703,7 @@
     <enumeration value="XBC"/>
     <enumeration value="XBD"/>
     <enumeration value="XCD"/>
+    <enumeration value="XCG"/>
     <enumeration value="XDR"/>
     <enumeration value="XOF"/>
     <enumeration value="XPD"/>
@@ -5691,7 +5723,6 @@
     <enumeration value="AFN"/>
     <enumeration value="ALL"/>
     <enumeration value="AMD"/>
-    <enumeration value="ANG"/>
     <enumeration value="AOA"/>
     <enumeration value="ARS"/>
     <enumeration value="AUD"/>
@@ -5700,7 +5731,6 @@
     <enumeration value="BAM"/>
     <enumeration value="BBD"/>
     <enumeration value="BDT"/>
-    <enumeration value="BGN"/>
     <enumeration value="BHD"/>
     <enumeration value="BIF"/>
     <enumeration value="BMD"/>
@@ -5720,6 +5750,7 @@
     <enumeration value="CHW"/>
     <enumeration value="CLF"/>
     <enumeration value="CLP"/>
+    <enumeration value="CNH"/>
     <enumeration value="CNY"/>
     <enumeration value="COP"/>
     <enumeration value="COU"/>
@@ -5852,6 +5883,7 @@
     <enumeration value="XBC"/>
     <enumeration value="XBD"/>
     <enumeration value="XCD"/>
+    <enumeration value="XCG"/>
     <enumeration value="XDR"/>
     <enumeration value="XOF"/>
     <enumeration value="XPD"/>
