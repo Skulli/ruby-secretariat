@@ -18,14 +18,15 @@ require "open-uri"
 
 module Secretariat
   class Validator
+    SCHEMA_VERSION = "1.09"
     SCHEMATRON = [
       "../../schemas/zugferd_1/ZUGFeRD1p0.sch",
-      "../../schemas/zugferd_2/Factur-X_1.07.3_EN16931.sch"
+      "../../schemas/zugferd_2/Factur-X_#{SCHEMA_VERSION}_EN16931.sch"
     ]
 
     SCHEMA = [
       "../../schemas/zugferd_1/ZUGFeRD1p0.xsd",
-      "../../schemas/zugferd_2/Factur-X_1.07.3_EN16931.xsd"
+      "../../schemas/zugferd_2/Factur-X_#{SCHEMA_VERSION}_EN16931.xsd"
     ]
 
     SCHEMA_DIR = [
