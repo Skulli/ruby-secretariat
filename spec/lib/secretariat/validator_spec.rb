@@ -61,7 +61,17 @@ RSpec.describe Secretariat::Validator do
   context "nicht unterstützte Version" do
     it "lehnt version 4 mit klarer Fehlermeldung ab" do
       expect { described_class.new("<xml/>", version: 4) }
-        .to raise_error(ArgumentError, /Unsupported Document Version/)
+        .to raise_error(ArgumentError, /Unsupported Document Version: 4 \(supported: 1\.\.3\)/)
+    end
+
+    it "lehnt nil ab" do
+      expect { described_class.new("<xml/>", version: nil) }
+        .to raise_error(ArgumentError, /Unsupported Document Version: nil/)
+    end
+
+    it "lehnt nicht-numerische Werte ab" do
+      expect { described_class.new("<xml/>", version: "2") }
+        .to raise_error(ArgumentError, /Unsupported Document Version: "2"/)
     end
   end
 end

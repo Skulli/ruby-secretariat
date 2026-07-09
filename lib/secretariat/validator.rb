@@ -35,8 +35,8 @@ module Secretariat
     ]
     attr_accessor :doc, :version
     def initialize(io_or_str, version: 1)
-      if version < 1 || version > 3
-        raise ArgumentError, "Unsupported Document Version"
+      unless version.is_a?(Integer) && (1..3).cover?(version)
+        raise ArgumentError, "Unsupported Document Version: #{version.inspect} (supported: 1..3)"
       end
       @doc = Nokogiri.XML(io_or_str)
       @version = version
