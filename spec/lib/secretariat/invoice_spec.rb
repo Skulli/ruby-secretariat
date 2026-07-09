@@ -117,11 +117,61 @@ RSpec.describe Secretariat::Invoice do
     describe "valid xml schema version 3" do
       let(:xml) { subject.to_xml(version: 3, mode: :xrechnung) }
 
-      let(:validator) { Secretariat::Validator.new(xml, version: 2) }
+      let(:validator) { Secretariat::Validator.new(xml, version: 3) }
 
       it {
         expect(validator.validate_against_schema).to be_empty
       }
+    end
+  end
+
+  describe "GuidelineSpecifiedDocumentContextParameter" do
+    def guideline_id(xml)
+      doc = Nokogiri::XML(xml)
+      doc.remove_namespaces!
+      doc.at_xpath("//GuidelineSpecifiedDocumentContextParameter/ID")&.text
+    end
+
+    it "setzt für ZUGFeRD v2 die neutrale EN16931-URN" do
+      expect(guideline_id(subject.to_xml(version: 2))).to eq("urn:cen.eu:en16931:2017")
+    end
+
+    it "setzt für ZUGFeRD v3 die neutrale EN16931-URN" do
+      expect(guideline_id(subject.to_xml(version: 3))).to eq("urn:cen.eu:en16931:2017")
+    end
+
+    it "setzt für XRechnung v3 die XRechnung-3.0-URN" do
+      expect(guideline_id(subject.to_xml(version: 3, mode: :xrechnung)))
+        .to eq("urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_3.0")
+    end
+
+    it "fällt für XRechnung v2 (abgekündigte 2.x-URNs) auf die EN16931-URN zurück" do
+      expect(guideline_id(subject.to_xml(version: 2, mode: :xrechnung))).to eq("urn:cen.eu:en16931:2017")
+    end
+  end
+
+  describe "Zahlungsangaben mit IBAN und Kontoinhaber" do
+    subject {
+      super().tap do |invoice|
+        invoice.payment_type = :SEPA_CREDIT
+        invoice.payment_iban = "DE02120300000000202051"
+        invoice.payment_bic = "BYLADEM1001"
+        invoice.payment_account_name = "Depfu inc"
+      end
+    }
+
+    let(:xml) { subject.to_xml(version: 2) }
+
+    it "gibt den Kontoinhaber als AccountName aus" do
+      doc = Nokogiri::XML(xml)
+      doc.remove_namespaces!
+      account = doc.at_xpath("//PayeePartyCreditorFinancialAccount")
+      expect(account.at_xpath("IBANID")&.text).to eq("DE02120300000000202051")
+      expect(account.at_xpath("AccountName")&.text).to eq("Depfu inc")
+    end
+
+    it "bleibt schema-valide" do
+      expect(Secretariat::Validator.new(xml, version: 2).validate_against_schema).to be_empty
     end
   end
 end

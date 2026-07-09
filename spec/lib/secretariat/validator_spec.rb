@@ -48,4 +48,20 @@ RSpec.describe Secretariat::Validator do
       expect(subject.validate_against_schematron).to be_empty
     }
   end
+
+  context "version 3 (nutzt die Factur-X-Schemas von version 2)" do
+    let(:xml) { File.open(Secretariat.file_path("spec/fixtures/zugferd_2/extended.xml")) }
+    subject { described_class.new(xml, version: 3) }
+
+    it {
+      expect(subject.validate_against_schema).to be_empty
+    }
+  end
+
+  context "nicht unterstützte Version" do
+    it "lehnt version 4 mit klarer Fehlermeldung ab" do
+      expect { described_class.new("<xml/>", version: 4) }
+        .to raise_error(ArgumentError, /Unsupported Document Version/)
+    end
+  end
 end

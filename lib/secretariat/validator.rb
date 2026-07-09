@@ -35,17 +35,20 @@ module Secretariat
     ]
     attr_accessor :doc, :version
     def initialize(io_or_str, version: 1)
+      if version < 1 || version > 3
+        raise ArgumentError, "Unsupported Document Version"
+      end
       @doc = Nokogiri.XML(io_or_str)
       @version = version
     end
 
     def schema
-      Nokogiri::XML.Schema File.open(File.join(__dir__, SCHEMA[version - 1]))
+      Nokogiri::XML.Schema File.open(File.join(__dir__, SCHEMA[schema_index]))
     end
 
     def schematron
       SchematronNokogiri::Schema.new(
-        Nokogiri::XML(File.open(File.join(__dir__, SCHEMATRON[version - 1])))
+        Nokogiri::XML(File.open(File.join(__dir__, SCHEMATRON[schema_index])))
       )
     end
 
@@ -55,10 +58,17 @@ module Secretariat
 
     def validate_against_schematron
       result = []
-      Dir.chdir File.join(__dir__, SCHEMA_DIR[version - 1]) do
+      Dir.chdir File.join(__dir__, SCHEMA_DIR[schema_index]) do
         result = schematron.validate(doc)
       end
       result
+    end
+
+    private
+
+    # Version 2 und 3 teilen sich die Factur-X-Schemas (CII-Struktur ist identisch)
+    def schema_index
+      (version == 1) ? 0 : 1
     end
   end
 end
