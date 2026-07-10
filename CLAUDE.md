@@ -18,7 +18,7 @@ bundle exec standardrb   # Code-Style (Pflicht vor Commit, CI prüft)
 Manuelle End-to-End-Validierung eines erzeugten XML/PDF (Regelwerk wird per Guideline-URN automatisch erkannt):
 
 ```sh
-java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.16.5.jar --no-notices --action validate --source <datei>
+java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.24.0.jar --no-notices --action validate --source <datei>
 ```
 
 ## Architektur
@@ -36,7 +36,7 @@ java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.16.5.jar --no-notices --a
 - Die Schematron-Validierung der Factur-X-Regeln scheitert am fehlenden XSLT-2-Support von `schematron-nokogiri` (betroffene Specs stehen auf `pending`). ZUGFeRD-1-Schematron funktioniert.
 - Die KoSIT-XRechnung-Regeln (BR-DE-*) sind **nicht** im Gem — vollständige XRechnung-Prüfung nur über die Mustang-CLI. XRechnung 3.0 verlangt u. a. Verkäufer-Kontakt (BR-DE-2) und bei offenem Betrag ein Fälligkeitsdatum oder Zahlungsbedingungen (BR-CO-25).
 - Pro Rechnung wird nur **ein Steuersatz** unterstützt (kein `taxes`-Array wie im Upstream).
-- Das Mustang-JAR (66 MB) liegt im Repo — bei Updates Dateinamen in `zugferd_pdf.rb` anpassen.
+- Das Mustang-JAR (~56 MB) liegt im Repo — bei Updates Dateinamen in `zugferd_pdf.rb` sowie README/CLAUDE.md anpassen und die PDF-Export-Specs plus einen manuellen `--action validate`-Lauf gegen ein v3-XML ausführen.
 
 ## Konventionen
 

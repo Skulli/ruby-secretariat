@@ -6,6 +6,8 @@
 - [FIX] `Validator` unterstützt `version: 3` (nutzt die Factur-X-Schemas von Version 2); unbekannte Versionen werfen `ArgumentError`
 - [CHG] Unerreichbaren `xrechnung_2.3`-Zweig und abgekündigte XRechnung-2.x-URNs entfernt: `mode: :xrechnung` liefert die XRechnung-3.0-URN nur noch bei `version: 3`, sonst die neutrale EN16931-Kennung
 - [CHG] Specs ergänzt: Guideline-URNs je mode/version, AccountName-Ausgabe, Validator v3
+- [CHG] Mustang-CLI 2.16.5 → 2.24.0: Validierungsregeln jetzt aktuell (XRechnung 3.0.2, EN16931-Schematron 1.3.15, ZUGFeRD 2.5/Factur-X 1.09), PDFBox-Sicherheitsfixes. Achtung: strengeres Regelwerk — XRechnung verlangt jetzt u. a. die elektronische Adresse des Käufers (BT-49, `contact_email` am buyer)
+- [CHG] README überarbeitet (deutsch, lauffähiges Beispiel, Format-Tabelle), CLAUDE.md ergänzt
 
 ## 2.1.3 (Tag `v2.1.3`, Sammelstand des Forks)
 

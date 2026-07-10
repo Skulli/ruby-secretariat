@@ -50,7 +50,8 @@ buyer = Secretariat::TradeParty.new(
   city: "Berlin",
   postal_code: "10115",
   country_id: "DE",
-  vat_id: "DE987654321"
+  vat_id: "DE987654321",
+  contact_email: "einkauf@example.org"  # Pflicht für XRechnung: elektronische Adresse (BT-49, PEPPOL-EN16931-R010)
 )
 
 line_item = Secretariat::LineItem.new(
@@ -110,7 +111,7 @@ validator.validate_against_schematron  # EN16931-Schematron (siehe Hinweis)
 - Die **KoSIT-XRechnung-Regeln (BR-DE-*) sind nicht enthalten** — `mode: :xrechnung` ist ein Generator-Modus, kein Validierungsprofil. Für eine vollständige Prüfung eignet sich die mitgelieferte Mustang-CLI:
 
 ```sh
-java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.16.5.jar \
+java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.24.0.jar \
   --no-notices --action validate --source rechnung.xml
 ```
 
