@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    secretariat (2.1.3)
+    secretariat (2.1.4)
       nokogiri (>= 1.10)
       schematron-nokogiri (~> 0.0, >= 0.0.3)
 

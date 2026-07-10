@@ -144,23 +144,11 @@ module Secretariat
             end
             xml["ram"].GuidelineSpecifiedDocumentContextParameter do
               version_id =
-                if mode == :xrechnung
-                  case version.to_s
-                  when /^3/
-                    # XRechnung 3.0 (Aktuelle Version, seit Feb 2024)
-                    "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_3.0"
-                  when /^2\.3/
-                    # XRechnung 2.3 (Abgelöst, aber oft noch akzeptiert)
-                    "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3"
-                  when /^2/ # Fängt 2.0, 2.1, 2.2 auf
-                    # XRechnung 2.x (Nutzt die älteste, aber gängige ID 2.2 als Default)
-                    "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.2"
-                  else
-                    # Fallback auf generische EN16931, falls die Version nicht erkannt wird
-                    "urn:cen.eu:en16931:2017"
-                  end
+                if mode == :xrechnung && version == 3
+                  # XRechnung 3.0 (aktuelle Version, seit Feb 2024; die 2.x-URNs sind abgekündigt)
+                  "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_3.0"
                 else
-                  # Fallback auf neutrale EN16931 (für ZUGFeRD EN16931/Comfort/Basic)
+                  # Neutrale EN16931-Kennung (ZUGFeRD EN16931/Comfort/Basic sowie Fallback)
                   "urn:cen.eu:en16931:2017"
                 end
               xml["ram"].ID version_id
@@ -266,7 +254,7 @@ module Secretariat
                   xml["ram"].PayeePartyCreditorFinancialAccount do
                     xml["ram"].IBANID payment_iban
                     if payment_account_name.to_s != ""
-                      xml["ram"].payment_account_name
+                      xml["ram"].AccountName payment_account_name
                     end
                   end
                   if payment_bic.to_s != ""
