@@ -41,6 +41,6 @@ java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.25.0.jar --no-notices --a
 ## Konventionen
 
 - Kommunikation, Kommentare, Commit-Messages und Doku auf **Deutsch**; Commit-Präfixe `fix:dev:` / `chg:dev:` (kurze einzeilige Messages, Details ggf. im Body).
-- Branch-Namen mit Unterstrichen (z. B. `fix_accountname_validator_v3`, `feature_zugferd_25`); PRs gegen `main`.
+- Branch-Namen mit Unterstrichen (z. B. `fix_accountname_validator_v3`, `feature_zugferd_25`); PRs gegen `main`. **PRs immer explizit mit `gh pr create --repo Skulli/ruby-secretariat` erstellen** — `gh` wählt bei Forks sonst das Upstream-Repo (fortytools) als Base.
 - Bei Änderungen: `CHANGELOG.md` pflegen und bei Merges nach `main` die Gem-Version in `lib/secretariat/version.rb` bumpen (Bugfixes = Patch); Releases auf `main` als `vX.Y.Z` taggen.
 - Der Hauptnutzer des Gems (symdok) folgt `branch: "main"` — jeder Merge nach `main` ist faktisch ein Release; Verhaltensänderungen im CHANGELOG kenntlich machen.
