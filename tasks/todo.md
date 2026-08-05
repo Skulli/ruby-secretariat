@@ -1,6 +1,6 @@
 # Schema-Update ZUGFeRD 2.5.2 / Factur-X 1.09.2 + Mustang 2.25.0
 
-Plan: ~/.claude/plans/zugferd-2-5-2-released-hier-kind-dream.md
+Plan und Kontext: siehe PR-Beschreibung sowie CHANGELOG-Abschnitt 2.2.0
 
 - [x] 1. Schemadateien in `schemas/zugferd_2/` austauschen (6 Dateien aus FeRD-Paket, unverändert)
 - [x] 2. `lib/secretariat/validator.rb`: `SCHEMA_VERSION = "1.09.2"`, fester Schematron-Pfad `FACTUR-X_EN16931.sch`

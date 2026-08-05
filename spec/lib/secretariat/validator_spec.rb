@@ -76,10 +76,13 @@ RSpec.describe Secretariat::Validator do
       end
     end
 
+    # Die Meldung stammt aus <xsl:message terminate="yes"> im ISO-Schematron-Skeleton und
+    # wird von Nokogiri/libxslt durchgereicht — die Exception-Klasse ist damit ein
+    # Implementierungsdetail von Nokogiri (Constraint nur ">= 1.10"). Entscheidend ist die Meldung.
     it "scheitert beim Laden des Factur-X-Schematrons an der bekannten XSLT-2-Einschränkung" do
       [2, 3].each do |version|
         validator = described_class.new("<xml/>", version: version)
-        expect { validator.schematron }.to raise_error(RuntimeError, /xslt2/)
+        expect { validator.schematron }.to raise_error(StandardError, /xslt2/i)
       end
     end
   end
