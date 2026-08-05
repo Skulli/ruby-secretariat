@@ -20,4 +20,5 @@ Plan: ~/.claude/plans/zugferd-2-5-2-released-hier-kind-dream.md
   - BR-DE-21: XRechnung-v3-URN auf `urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0` aktualisiert (KoSIT-Namensraum seit XRechnung 3.0)
   - CII-SR-310..315: `ShipToTradeParty` rendert nur noch ID/Name/Adresse (neuer Parameter `ship_to:` in `TradeParty#to_xml`); Buyer-Daten bleiben im `BuyerTradeParty` vollständig
   - Nach den Fixes: beide XMLs valide, 0 Warnungen im Prüfbericht
+- Code-Review-Befunde nachgezogen: CHANGELOG-Aussage zur Schematron-Nutzbarkeit korrigiert, wirkungslose ZUGFeRD-1-Spec entfernt (ZUGFeRD1p0.sch hat keine `document()`-Referenzen), toten Parameter `exclude_tax:` entfernt, Debitorennummer wird beim Käufer-als-Lieferanschrift nicht mehr als BT-71 ausgegeben (bei explizitem `recipient` weiterhin).
 - Follow-ups (bewusst außen vor): XSLT-2-Stylesheet aus dem FeRD-Paket zur Behebung der Schematron-Pendings; Upstream-PR an halfbyte; FeRD-Errata bis 1.9.2026 beobachten.

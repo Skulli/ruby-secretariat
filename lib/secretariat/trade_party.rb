@@ -19,8 +19,10 @@ module Secretariat
     keyword_init: true) do
     # ship_to: als Lieferanschrift (BG-13) darf die Partei laut EN16931 nur ID, Name
     # und Adresse enthalten (CII-SR-310..315) — Kontakt-, Register- und Steuerdaten entfallen dort
-    def to_xml(xml, exclude_tax: false, ship_to: false, version: 2)
-      if trade_party_id.to_s != ""
+    # omit_id: unterdrückt zusätzlich die ID; nötig, wenn der Käufer als Lieferanschrift dient,
+    # denn dessen trade_party_id ist die Debitorennummer (BT-46) und keine Lieferort-Kennung (BT-71)
+    def to_xml(xml, ship_to: false, omit_id: false, version: 2)
+      if !omit_id && trade_party_id.to_s != ""
         xml["ram"].ID trade_party_id
       end
       xml["ram"].Name name
@@ -66,7 +68,7 @@ module Secretariat
         end
       end
       # UST-ID
-      if !ship_to && !exclude_tax && vat_id.to_s != ""
+      if !ship_to && vat_id.to_s != ""
         xml["ram"].SpecifiedTaxRegistration do
           xml["ram"].ID(schemeID: "VA") do
             xml.text(vat_id)

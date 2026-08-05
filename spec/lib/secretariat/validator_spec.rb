@@ -61,17 +61,18 @@ RSpec.describe Secretariat::Validator do
   context "Schematron-Artefakte" do
     # Ein echter Schematron-Lauf für v2/v3 scheitert an XSLT 2 (siehe pending oben),
     # daher wird die Verknüpfung .sch -> codedb hier statisch abgesichert.
-    {0 => "ZUGFeRD 1", 1 => "Factur-X"}.each do |idx, name|
-      it "alle document()-Referenzen im #{name}-Schematron zeigen auf vorhandene Dateien" do
-        lib_dir = Secretariat.file_path("lib/secretariat")
-        schema_dir = File.expand_path(described_class::SCHEMA_DIR[idx], lib_dir)
-        sch = File.read(File.expand_path(described_class::SCHEMATRON[idx], lib_dir), encoding: "UTF-8")
-        referenced = sch.scan(/document\('([^']+)'\)/).flatten.uniq
-        expect(referenced).not_to be_empty if idx == 1
-        referenced.each do |filename|
-          expect(File).to exist(File.join(schema_dir, filename)),
-            "#{filename} wird im Schematron referenziert, fehlt aber in #{schema_dir}"
-        end
+    # Nur das Factur-X-Schematron referenziert externe Dateien (die codedb);
+    # ZUGFeRD1p0.sch kommt ohne document() aus und wird hier deshalb nicht geprüft.
+    it "alle document()-Referenzen im Factur-X-Schematron zeigen auf vorhandene Dateien" do
+      idx = 1
+      lib_dir = Secretariat.file_path("lib/secretariat")
+      schema_dir = File.expand_path(described_class::SCHEMA_DIR[idx], lib_dir)
+      sch = File.read(File.expand_path(described_class::SCHEMATRON[idx], lib_dir), encoding: "UTF-8")
+      referenced = sch.scan(/document\('([^']+)'\)/).flatten.uniq
+      expect(referenced).not_to be_empty
+      referenced.each do |filename|
+        expect(File).to exist(File.join(schema_dir, filename)),
+          "#{filename} wird im Schematron referenziert, fehlt aber in #{schema_dir}"
       end
     end
 

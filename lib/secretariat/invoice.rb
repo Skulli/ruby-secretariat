@@ -233,7 +233,8 @@ module Secretariat
                   if !recipient.nil?
                     recipient.to_xml(xml, ship_to: true, version: version)
                   else
-                    buyer.to_xml(xml, ship_to: true, version: version)
+                    # Käufer als Lieferanschrift: seine Debitorennummer ist keine Lieferort-Kennung (BT-71)
+                    buyer.to_xml(xml, ship_to: true, omit_id: true, version: version)
                   end
                 end
               end

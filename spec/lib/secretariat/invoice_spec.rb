@@ -164,7 +164,8 @@ RSpec.describe Secretariat::Invoice do
           registration_number: "HRB 12345",
           contact_name: "Max Muster",
           contact_phone: "+49 30 123456",
-          contact_email: "einkauf@kunde.example"
+          contact_email: "einkauf@kunde.example",
+          trade_party_id: "DEB-4711"
         )
       end
     }
@@ -186,9 +187,30 @@ RSpec.describe Secretariat::Invoice do
 
     it "behält dieselben Daten im BuyerTradeParty-Block" do
       buyer_el = doc.at_xpath("//BuyerTradeParty")
-      %w[DefinedTradeContact URIUniversalCommunication SpecifiedLegalOrganization SpecifiedTaxRegistration].each do |el|
+      %w[ID DefinedTradeContact URIUniversalCommunication SpecifiedLegalOrganization SpecifiedTaxRegistration].each do |el|
         expect(buyer_el.at_xpath(el)).not_to be_nil, "#{el} muss im BuyerTradeParty erhalten bleiben"
       end
+      expect(buyer_el.at_xpath("ID").text).to eq("DEB-4711")
+    end
+
+    it "gibt die Debitorennummer des Käufers nicht als Lieferort-Kennung (BT-71) aus" do
+      expect(doc.at_xpath("//ShipToTradeParty/ID")).to be_nil
+    end
+
+    it "übernimmt bei abweichendem Empfänger dessen ID als BT-71" do
+      subject.recipient = Secretariat::TradeParty.new(
+        name: "Lager Nord",
+        street1: "Hafenstr. 9",
+        city: "Hamburg",
+        postal_code: "20457",
+        country_id: "DE",
+        trade_party_id: "LAGER-01"
+      )
+      ship_to_doc = Nokogiri::XML(subject.to_xml(version: 3, skip_validation: true))
+      ship_to_doc.remove_namespaces!
+      ship_to = ship_to_doc.at_xpath("//ShipToTradeParty")
+      expect(ship_to.at_xpath("ID")&.text).to eq("LAGER-01")
+      expect(ship_to.at_xpath("Name")&.text).to eq("Lager Nord")
     end
   end
 
