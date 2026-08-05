@@ -140,13 +140,55 @@ RSpec.describe Secretariat::Invoice do
       expect(guideline_id(subject.to_xml(version: 3))).to eq("urn:cen.eu:en16931:2017")
     end
 
-    it "setzt für XRechnung v3 die XRechnung-3.0-URN" do
+    it "setzt für XRechnung v3 die XRechnung-3.0-URN (xeinkauf.de-Namensraum, BR-DE-21)" do
       expect(guideline_id(subject.to_xml(version: 3, mode: :xrechnung)))
-        .to eq("urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_3.0")
+        .to eq("urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0")
     end
 
     it "fällt für XRechnung v2 (abgekündigte 2.x-URNs) auf die EN16931-URN zurück" do
       expect(guideline_id(subject.to_xml(version: 2, mode: :xrechnung))).to eq("urn:cen.eu:en16931:2017")
+    end
+  end
+
+  describe "ShipToTradeParty (BG-13: nur ID, Name, Adresse — CII-SR-310..315)" do
+    subject {
+      super().tap do |invoice|
+        invoice.buyer = Secretariat::TradeParty.new(
+          name: "Kunde AG",
+          street1: "Kundenweg 2",
+          city: "Berlin",
+          postal_code: "10115",
+          country_id: "DE",
+          vat_id: "DE123456789",
+          tax_id: "12/345/67890",
+          registration_number: "HRB 12345",
+          contact_name: "Max Muster",
+          contact_phone: "+49 30 123456",
+          contact_email: "einkauf@kunde.example"
+        )
+      end
+    }
+
+    let(:doc) {
+      doc = Nokogiri::XML(subject.to_xml(version: 3, skip_validation: true))
+      doc.remove_namespaces!
+      doc
+    }
+
+    it "rendert die Lieferanschrift ohne Kontakt-, Register- und Steuerdaten" do
+      ship_to = doc.at_xpath("//ShipToTradeParty")
+      expect(ship_to.at_xpath("Name")&.text).to eq("Kunde AG")
+      expect(ship_to.at_xpath("PostalTradeAddress")).not_to be_nil
+      %w[DefinedTradeContact URIUniversalCommunication SpecifiedLegalOrganization SpecifiedTaxRegistration].each do |el|
+        expect(ship_to.at_xpath(el)).to be_nil, "#{el} darf in ShipToTradeParty nicht vorkommen"
+      end
+    end
+
+    it "behält dieselben Daten im BuyerTradeParty-Block" do
+      buyer_el = doc.at_xpath("//BuyerTradeParty")
+      %w[DefinedTradeContact URIUniversalCommunication SpecifiedLegalOrganization SpecifiedTaxRegistration].each do |el|
+        expect(buyer_el.at_xpath(el)).not_to be_nil, "#{el} muss im BuyerTradeParty erhalten bleiben"
+      end
     end
   end
 

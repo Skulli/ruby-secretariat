@@ -6,6 +6,8 @@
 - [CHG] Schematron und codedb liegen jetzt unter den FeRD-Originalnamen ohne Versionssuffix (`FACTUR-X_EN16931.sch`, `FACTUR-X_EN16931_codedb.xml`); `Validator::SCHEMA_VERSION` steuert nur noch die XSD-Dateinamen
 - [CHG] Mustang-CLI 2.24.0 → 2.25.0: Validierungsregeln für ZUGFeRD 2.5.2/Factur-X 1.09.2, VeraPDF-Sicherheitsfixes (CVE-2026-54078, CVE-2026-54079)
 - [CHG] Neue Specs: `document()`-Referenzen im Schematron zeigen auf vorhandene Dateien, Schematron lädt für version 2/3
+- [FIX] XRechnung-v3-URN (BT-24) auf den seit XRechnung 3.0 gültigen KoSIT-Namensraum aktualisiert: `urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0` (vorher `urn:xoev-de:kosit:standard:xrechnung_3.0` → BR-DE-21-Warnung)
+- [FIX] `ShipToTradeParty` (BG-13) enthält nur noch ID, Name und Adresse (EN16931 CII-SR-310..315): Kontakt-, Register- und Steuerdaten der Liefer-Partei werden nicht mehr ausgegeben — beim Buyer bleiben sie im `BuyerTradeParty`-Block vollständig erhalten (`TradeParty#to_xml` hat dafür einen neuen Parameter `ship_to:`)
 
 ## 2.1.4
 

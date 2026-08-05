@@ -145,8 +145,9 @@ module Secretariat
             xml["ram"].GuidelineSpecifiedDocumentContextParameter do
               version_id =
                 if mode == :xrechnung && version == 3
-                  # XRechnung 3.0 (aktuelle Version, seit Feb 2024; die 2.x-URNs sind abgekündigt)
-                  "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_3.0"
+                  # XRechnung 3.0 (aktuelle Version, seit Feb 2024; die 2.x-URNs sind abgekündigt).
+                  # Seit 3.0 lautet der KoSIT-Namensraum urn:xeinkauf.de:kosit (BR-DE-21), nicht mehr urn:xoev-de:kosit:standard
+                  "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0"
                 else
                   # Neutrale EN16931-Kennung (ZUGFeRD EN16931/Comfort/Basic sowie Fallback)
                   "urn:cen.eu:en16931:2017"
@@ -230,9 +231,9 @@ module Secretariat
               if version >= 2
                 xml["ram"].ShipToTradeParty do
                   if !recipient.nil?
-                    recipient.to_xml(xml, exclude_tax: true, version: version)
+                    recipient.to_xml(xml, ship_to: true, version: version)
                   else
-                    buyer.to_xml(xml, exclude_tax: true, version: version)
+                    buyer.to_xml(xml, ship_to: true, version: version)
                   end
                 end
               end

@@ -16,7 +16,7 @@ Dies ist ein eigenständig gepflegter Fork: [halfbyte/ruby-secretariat](https://
 | 1 | `:zugferd` | ZUGFeRD 1.0 (`CrossIndustryDocument`) |
 | 2 | `:zugferd` | ZUGFeRD 2.x / Factur-X, Profil EN16931 (`urn:cen.eu:en16931:2017`) |
 | 3 | `:zugferd` | wie Version 2 (identische CII-Struktur) |
-| 3 | `:xrechnung` | XRechnung 3.0 (`urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_3.0`) |
+| 3 | `:xrechnung` | XRechnung 3.0 (`urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0`) |
 
 Die mitgelieferten Schemas entsprechen **Factur-X 1.09.2 (ZUGFeRD 2.5.2), Profil EN16931**. Für ZUGFeRD 2.x wird ausschließlich das EN16931-Profil unterstützt. `mode: :xrechnung` mit `version: 2` fällt auf die neutrale EN16931-URN zurück (die XRechnung-2.x-URNs sind abgekündigt).
 
