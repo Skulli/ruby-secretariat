@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.2.0
+
+- [CHG] Schemas auf **Factur-X 1.09.2 (ZUGFeRD 2.5.2)** aktualisiert (gültig ab 1. September 2026). Die XSDs sind inhaltlich unverändert (die 2.5.2-XSD-Änderungen betreffen nur das nicht gebündelte Profil EXTENDED); die Schematron-Regeln wurden aktualisiert (u. a. BR-CO-27 → CII-SR-470, neuer Metadaten-Header)
+- [CHG] Schematron und codedb liegen jetzt unter den FeRD-Originalnamen ohne Versionssuffix (`FACTUR-X_EN16931.sch`, `FACTUR-X_EN16931_codedb.xml`); `Validator::SCHEMA_VERSION` steuert nur noch die XSD-Dateinamen
+- [CHG] Mustang-CLI 2.24.0 → 2.25.0: Validierungsregeln für ZUGFeRD 2.5.2/Factur-X 1.09.2, VeraPDF-Sicherheitsfixes (CVE-2026-54078, CVE-2026-54079)
+- [CHG] Neue Specs: `document()`-Referenzen im Factur-X-Schematron zeigen auf vorhandene Dateien; die bekannte XSLT-2-Einschränkung (Schematron-Validierung für version 2/3 ist weiterhin **nicht** nutzbar) ist als Spec festgehalten
+- [FIX] XRechnung-v3-URN (BT-24) auf den seit XRechnung 3.0 gültigen KoSIT-Namensraum aktualisiert: `urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0` (vorher `urn:xoev-de:kosit:standard:xrechnung_3.0` → BR-DE-21-Warnung)
+- [FIX] `ShipToTradeParty` (BG-13) enthält nur noch ID, Name und Adresse (EN16931 CII-SR-310..315): Kontakt-, Register- und Steuerdaten der Liefer-Partei werden nicht mehr ausgegeben — beim Buyer bleiben sie im `BuyerTradeParty`-Block vollständig erhalten (`TradeParty#to_xml` hat dafür einen neuen Parameter `ship_to:`)
+- [FIX] Dient der Käufer als Lieferanschrift, wird seine Debitorennummer nicht mehr als Lieferort-Kennung (BT-71) ausgegeben — sie ist BT-46 und bleibt im `BuyerTradeParty` erhalten. Bei explizitem `recipient` wird dessen `trade_party_id` weiterhin als BT-71 übernommen
+- [CHG] `TradeParty#to_xml`: Parameter `exclude_tax:` entfernt (durch `ship_to:` abgelöst, hatte keine Aufrufer mehr)
+
 ## 2.1.4
 
 - [FIX] Kontoinhaber wird jetzt als `<ram:AccountName>` ausgegeben (wurde bisher nie ins XML geschrieben)

@@ -7,7 +7,7 @@
 
 Ruby-Gem zum Erzeugen und Validieren elektronischer Rechnungen im ZUGFeRD-/Factur-X- und XRechnung-Format (CII-Syntax), inklusive PDF/A-3-Export über die Mustang-CLI.
 
-Dies ist ein eigenständig gepflegter Fork: [halfbyte/ruby-secretariat](https://github.com/halfbyte/ruby-secretariat) → [fortytools/ruby-secretariat](https://github.com/fortytools/ruby-secretariat) (XRechnung-Modus) → **Skulli/ruby-secretariat** (Schema-Updates bis ZUGFeRD 2.5, PDF-Export, Fixes).
+Dies ist ein eigenständig gepflegter Fork: [halfbyte/ruby-secretariat](https://github.com/halfbyte/ruby-secretariat) → [fortytools/ruby-secretariat](https://github.com/fortytools/ruby-secretariat) (XRechnung-Modus) → **Skulli/ruby-secretariat** (Schema-Updates bis ZUGFeRD 2.5.2, PDF-Export, Fixes).
 
 ## Unterstützte Formate
 
@@ -16,9 +16,9 @@ Dies ist ein eigenständig gepflegter Fork: [halfbyte/ruby-secretariat](https://
 | 1 | `:zugferd` | ZUGFeRD 1.0 (`CrossIndustryDocument`) |
 | 2 | `:zugferd` | ZUGFeRD 2.x / Factur-X, Profil EN16931 (`urn:cen.eu:en16931:2017`) |
 | 3 | `:zugferd` | wie Version 2 (identische CII-Struktur) |
-| 3 | `:xrechnung` | XRechnung 3.0 (`urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_3.0`) |
+| 3 | `:xrechnung` | XRechnung 3.0 (`urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0`) |
 
-Die mitgelieferten Schemas entsprechen **Factur-X 1.09 (ZUGFeRD 2.5), Profil EN16931**. Für ZUGFeRD 2.x wird ausschließlich das EN16931-Profil unterstützt. `mode: :xrechnung` mit `version: 2` fällt auf die neutrale EN16931-URN zurück (die XRechnung-2.x-URNs sind abgekündigt).
+Die mitgelieferten Schemas entsprechen **Factur-X 1.09.2 (ZUGFeRD 2.5.2), Profil EN16931**. Für ZUGFeRD 2.x wird ausschließlich das EN16931-Profil unterstützt. `mode: :xrechnung` mit `version: 2` fällt auf die neutrale EN16931-URN zurück (die XRechnung-2.x-URNs sind abgekündigt).
 
 ## Installation
 
@@ -111,7 +111,7 @@ validator.validate_against_schematron  # EN16931-Schematron (siehe Hinweis)
 - Die **KoSIT-XRechnung-Regeln (BR-DE-*) sind nicht enthalten** — `mode: :xrechnung` ist ein Generator-Modus, kein Validierungsprofil. Für eine vollständige Prüfung eignet sich die mitgelieferte Mustang-CLI:
 
 ```sh
-java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.24.0.jar \
+java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.25.0.jar \
   --no-notices --action validate --source rechnung.xml
 ```
 

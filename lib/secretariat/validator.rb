@@ -18,10 +18,11 @@ require "open-uri"
 
 module Secretariat
   class Validator
-    SCHEMA_VERSION = "1.09"
+    SCHEMA_VERSION = "1.09.2"
     SCHEMATRON = [
       "../../schemas/zugferd_1/ZUGFeRD1p0.sch",
-      "../../schemas/zugferd_2/Factur-X_#{SCHEMA_VERSION}_EN16931.sch"
+      # FeRD liefert Schematron/codedb seit 2.5.2 ohne Versionssuffix im Dateinamen
+      "../../schemas/zugferd_2/FACTUR-X_EN16931.sch"
     ]
 
     SCHEMA = [

@@ -17,17 +17,21 @@ module Secretariat
     :name, :street1, :street2, :city, :postal_code, :country_id, :vat_id, :contact_name, :contact_phone, :contact_fax, :contact_email,
     :tax_id, :registration_number, :trade_party_id,
     keyword_init: true) do
-    def to_xml(xml, exclude_tax: false, version: 2)
-      if trade_party_id.to_s != ""
+    # ship_to: als Lieferanschrift (BG-13) darf die Partei laut EN16931 nur ID, Name
+    # und Adresse enthalten (CII-SR-310..315) — Kontakt-, Register- und Steuerdaten entfallen dort
+    # omit_id: unterdrückt zusätzlich die ID; nötig, wenn der Käufer als Lieferanschrift dient,
+    # denn dessen trade_party_id ist die Debitorennummer (BT-46) und keine Lieferort-Kennung (BT-71)
+    def to_xml(xml, ship_to: false, omit_id: false, version: 2)
+      if !omit_id && trade_party_id.to_s != ""
         xml["ram"].ID trade_party_id
       end
       xml["ram"].Name name
-      if registration_number.to_s != ""
+      if !ship_to && registration_number.to_s != ""
         xml["ram"].SpecifiedLegalOrganization do
           xml["ram"].ID registration_number
         end
       end
-      if contact_name.to_s != ""
+      if !ship_to && contact_name.to_s != ""
         xml["ram"].DefinedTradeContact do
           xml["ram"].PersonName contact_name
           if contact_phone.to_s != ""
@@ -56,7 +60,7 @@ module Secretariat
         xml["ram"].CityName city
         xml["ram"].CountryID country_id
       end
-      if version == 3 && contact_email.to_s != ""
+      if !ship_to && version == 3 && contact_email.to_s != ""
         xml["ram"].URIUniversalCommunication do
           xml["ram"].URIID(schemeID: "EM") do
             xml.text(contact_email)
@@ -64,7 +68,7 @@ module Secretariat
         end
       end
       # UST-ID
-      if !exclude_tax && vat_id.to_s != ""
+      if !ship_to && vat_id.to_s != ""
         xml["ram"].SpecifiedTaxRegistration do
           xml["ram"].ID(schemeID: "VA") do
             xml.text(vat_id)
@@ -72,7 +76,7 @@ module Secretariat
         end
       end
       # Steuernummer
-      if tax_id.to_s != ""
+      if !ship_to && tax_id.to_s != ""
         xml["ram"].SpecifiedTaxRegistration do
           xml["ram"].ID(schemeID: "FC") do
             xml.text(tax_id)
