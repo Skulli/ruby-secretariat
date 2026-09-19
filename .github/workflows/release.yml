@@ -1,0 +1,173 @@
+# Legt bei einem Versions-Tag ein GitHub-Release an -- nachdem dieselben
+# Pruefungen gelaufen sind wie im Pull Request.
+#
+# DIE REIHENFOLGE IST DER PUNKT: erst pruefen, dann veroeffentlichen. Ein
+# Release, dessen Suite nicht durchlaeuft, hat niemanden zu erreichen.
+#
+# ZWEI REGELN ZUM TAGGEN, beide aus ruby_gkv_billing uebernommen:
+#
+#  1. Scheitert der Lauf, wird der Tag ENTFERNT, nicht liegengelassen. Die
+#     Notizen des naechsten Releases bestimmen ihren Startpunkt aus der
+#     Tag-Liste -- ein Tag ohne Release wird trotzdem zum Startpunkt, und dem
+#     naechsten Release fehlt alles dazwischen. Der Fehlerfall unten nennt den
+#     Befehl.
+#
+#  2. Getaggt wird auf main, nicht auf dem Branch. Pull Requests werden per
+#     Squash gemergt; wer auf dem Branch taggt, bekommt zwar ein Release mit
+#     dem richtigen Inhalt, aber der eigene Pull Request fehlt in den Notizen --
+#     GitHub vergleicht bis zum getaggten Commit, und der Squash-Commit liegt
+#     danach.
+
+name: Release
+
+on:
+  push:
+    tags:
+      # v[0-9]* und nicht v*: Das offene Glob faengt auch Tags wie
+      # "vorher-noch-testen". Fuer die wuerde gebaut und ein Release angelegt --
+      # und dieses Release wuerde zum Startpunkt der naechsten Notizen.
+      - "v[0-9]*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  veroeffentlichen:
+    runs-on: ubuntu-latest
+
+    steps:
+      # fetch-depth: 0, weil der Schritt "Release erstellen" die Tag-Historie
+      # braucht, um den Vorgaenger zu bestimmen.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # Regel 2 aus dem Kopf, erzwungen statt nur aufgeschrieben.
+      #
+      # Geprueft wird "der getaggte Commit ist von main aus erreichbar", also
+      # HEAD als Vorfahr von main. Nicht andersherum: main als Vorfahr von HEAD
+      # waere falsch, sobald jemand einen aelteren Commit auf main taggt -- ein
+      # zulaessiger Fall, etwa fuer einen Nachzuegler.
+      - name: Tag liegt auf main
+        # Der Tag-Name kommt ueber die Umgebung und nicht als ${{ }} in den
+        # Shell-Quelltext. GitHub setzt solche Ausdruecke vorher textuell ein,
+        # und Git erlaubt in Ref-Namen fast alles -- "v1;befehl" ist gueltig und
+        # trifft den Trigger. Eingesetzt fuehrte die Shell das aus.
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor HEAD FETCH_HEAD; then
+            echo "::error::${TAG_NAME//[^a-zA-Z0-9._-]/?} zeigt auf einen Commit, der nicht auf main liegt." \
+                 "Pull Requests werden per Squash gemergt -- auf dem Branch getaggt fehlt der eigene" \
+                 "Pull Request spaeter in den Notizen. Tag entfernen und auf main neu setzen."
+            exit 1
+          fi
+          echo "Getaggter Commit liegt auf main."
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler: default
+          bundler-cache: true
+
+      - name: Standardrb Check
+        run: bundle exec standardrb
+
+      - name: Run tests
+        # SimpleCov laeuft nur mit COVERAGE=1 -- ohne das hier greift auch die
+        # Untergrenze aus spec_helper.rb nicht.
+        env:
+          COVERAGE: 1
+        run: bundle exec rspec
+
+      - name: Release erstellen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          # Ein zweiter Anlauf desselben Tags -- etwa von Hand, nachdem ein
+          # Schritt darunter gescheitert war -- soll nicht daran abbrechen, dass
+          # es das Release schon gibt. Genau dann braucht man ihn.
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            echo "Release ${TAG} gibt es schon -- nichts zu tun."
+            exit 0
+          fi
+
+          # Der vorige Versions-Tag als Startpunkt der Liste.
+          #
+          # Ohne Angabe nimmt GitHub das letzte RELEASE, und solange es keins
+          # gibt, ist das der Anfang der Historie -- die Liste umfasste dann
+          # jeden Pull Request des Repositories. Dieses Repository hat Tags, aber
+          # noch kein Release; ohne diese Zeilen waere die erste Liste also die
+          # gesamte Historie.
+          #
+          # Erst sammeln, dann auswerten: ein frueh geschlossenes Rohr laesst
+          # git ein SIGPIPE sehen, und mit "pipefail" reisst das den ganzen
+          # Schritt mit.
+          alle_tags=$(git tag --list 'v[0-9]*' --sort=-v:refname)
+          vorher=$(awk -v t="${TAG}" 'gefunden { print; exit } $0 == t { gefunden = 1 }' <<< "$alle_tags")
+          echo "Tag: ${TAG}, Vorgaenger: ${vorher:-keiner}"
+
+          if [ -n "$vorher" ]; then
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="${TAG}" -f previous_tag_name="$vorher" --jq '.body' > "$RUNNER_TEMP/liste.md"
+          else
+            echo "::warning::Kein vorheriger Versions-Tag. Die Liste umfasst die gesamte" \
+                 "Historie und will von Hand gekuerzt werden -- das trifft nur das erste Release."
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="${TAG}" --jq '.body' > "$RUNNER_TEMP/liste.md"
+          fi
+
+          # Die Ueberschriften hier heissen "## 2.2.0", ohne eckige Klammern.
+          # Das gsub schadet nicht und haelt die Datei deckungsgleich mit den
+          # uebrigen Gems, deren Ueberschriften welche tragen. Das v des Tags
+          # faellt weg, die Ueberschrift traegt keines.
+          awk -v ohne="${TAG#v}" '
+            $1 == "##" {
+              kopf = $2
+              gsub(/[][]/, "", kopf)
+              if (drin) { exit }
+              if (kopf == ohne) { drin = 1; next }
+            }
+            drin { print }
+          ' CHANGELOG.md > "$RUNNER_TEMP/kopf.md"
+
+          if grep -q '[^[:space:]]' "$RUNNER_TEMP/kopf.md"; then
+            {
+              echo "## Hinweise zu dieser Version"
+              echo
+              cat "$RUNNER_TEMP/kopf.md"
+              echo
+              echo "---"
+              echo
+            } > "$RUNNER_TEMP/notizen.md"
+          else
+            echo "::warning::Kein Abschnitt '## [${TAG#v}]' in CHANGELOG.md."
+            : > "$RUNNER_TEMP/notizen.md"
+          fi
+          cat "$RUNNER_TEMP/liste.md" >> "$RUNNER_TEMP/notizen.md"
+
+          gh release create "${TAG}" --title "${TAG}" --notes-file "$RUNNER_TEMP/notizen.md"
+          echo "Release ${TAG} angelegt."
+
+      # Siehe Regel 1 im Kopf: ein Tag ohne Release verdirbt die Notizen des
+      # naechsten. Automatisch geloescht wird er nicht -- das Entfernen einer
+      # Referenz gehoert in eine Hand, die weiss warum.
+      - name: Hinweis bei Fehlschlag
+        # Auch bei Abbruch: gerade dann liegt der Tag ohne Release da.
+        if: failure() || cancelled()
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          echo "::error::Der Lauf ist gescheitert. Den Tag entfernen, sonst wird er zum" \
+               "Startpunkt der naechsten Release-Notizen:"
+          echo "  git push origin ':refs/tags/${TAG_NAME}'"
+          echo "  git tag -d '${TAG_NAME}'"
