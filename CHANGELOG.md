@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.2.1] - 2026-09-19
+
+### Geändert
+- Release-Workflow nach dem Vorbild aus `ruby_gkv_billing`.
+- Abdeckung wird gemessen (`COVERAGE=1`), Untergrenze 75 % bei aktuell 80,22 %.
+
+### Korrigiert
+- CI prueft auch Pull Requests, deren Ziel ein Branch mit Schraegstrich ist.
+- `actions/checkout` von v3 auf v7 (v3 ist fuer die heutigen Runner zu alt).
+
 ## 2.2.0
 
 - [CHG] Schemas auf **Factur-X 1.09.2 (ZUGFeRD 2.5.2)** aktualisiert (gültig ab 1. September 2026). Die XSDs sind inhaltlich unverändert (die 2.5.2-XSD-Änderungen betreffen nur das nicht gebündelte Profil EXTENDED); die Schematron-Regeln wurden aktualisiert (u. a. BR-CO-27 → CII-SR-470, neuer Metadaten-Header)
