@@ -31,5 +31,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec", "~> 3.0"
   s.add_development_dependency "standard"
   s.add_development_dependency "bigdecimal"
-  s.add_development_dependency "simplecov"
+  # simplecov 1.3 verlangt Ruby >= 3.3, die CI-Matrix testet aber 3.2 mit.
+  # Der Deckel faellt weg, sobald die Untergrenze steigt.
+  s.add_development_dependency "simplecov", "< 1.3"
 end
