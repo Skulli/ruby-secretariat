@@ -3,7 +3,11 @@ name: Tests
 on:
   pull_request:
     branches:
-      - '*'
+      # '**' und nicht '*': der einfache Stern matcht keinen Schraegstrich.
+      # Ein Pull Request von einem Branch wie claude/etwas bekam damit gar
+      # keine Pruefung, und zwar lautlos - es gab keine rote Pruefung, es gab
+      # ueberhaupt keine.
+      - '**'
   push:
     branches:
       - main
