@@ -3,10 +3,11 @@ name: Tests
 on:
   pull_request:
     branches:
-      # '**' und nicht '*': der einfache Stern matcht keinen Schraegstrich.
-      # Ein Pull Request von einem Branch wie claude/etwas bekam damit gar
-      # keine Pruefung, und zwar lautlos - es gab keine rote Pruefung, es gab
-      # ueberhaupt keine.
+      # '**' und nicht '*': Der Filter gilt dem ZIEL-Branch, nicht dem Branch,
+      # von dem der Pull Request kommt -- und der einfache Stern matcht keinen
+      # Schraegstrich. Ein gestapelter Pull Request, der auf einen Branch wie
+      # claude/basis zeigt statt auf main, bekam damit gar keine Pruefung, und
+      # zwar lautlos: es gab keine rote Pruefung, es gab ueberhaupt keine.
       - '**'
   push:
     branches:
