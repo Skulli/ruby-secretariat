@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -35,6 +35,11 @@ jobs:
         run: bundle exec standardrb
 
       - name: Run tests
+        # SimpleCov laeuft nur mit COVERAGE=1 -- ohne das hier greift auch die
+        # Untergrenze aus spec_helper.rb nicht, und ein Absturz der Abdeckung
+        # liefe still durch.
+        env:
+          COVERAGE: 1
         run: |
           bundle exec rspec
 
