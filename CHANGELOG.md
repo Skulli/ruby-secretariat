@@ -1,14 +1,28 @@
 # Changelog
 
-## [2.3.0] - 2026-11-24
+## [2.4.0] - 2026-11-24
 
-### Neu
+### Hinzugefügt
 - SEPA-Lastschrift (Zahlungsart 59, `payment_type: :SEPA_DEBIT`): neue Felder `direct_debit_mandate_reference_id` (Mandatsreferenz, BT-89 → `ram:DirectDebitMandateID`), `direct_debit_creditor_id` (Gläubiger-ID, BT-90 → `ram:CreditorReferenceID`) und `direct_debit_iban` (belastetes Konto, BT-91 → `ram:PayerPartyDebtorFinancialAccount/ram:IBANID`). Ohne Werte entfallen die Elemente; bestehende Rechnungen bleiben unverändert.
 - ZUGFeRD 1 (`version: 1`) hat für Mandatsreferenz und Gläubiger-ID kein eigenes Element; dort wird nur das belastete Konto ausgegeben.
 - Für XRechnung bei Code 59 Gläubiger-ID und Schuldner-IBAN angeben (BR-DE-30/31).
 
 ### Geändert
 - `mode: :xrechnung` mit Code 59 gibt das Empfängerkonto (`payment_iban`, `payment_bic`, `payment_account_name`) nicht mehr aus, weil XRechnung es bei Lastschrift verbietet (BR-DE-25-b). ZUGFeRD gibt es weiterhin aus.
+
+## [2.3.0] - 2026-11-24
+
+### Hinzugefügt
+- `Invoice#payment_reference`: Verwendungszweck (BT-83) als `PaymentReference` im Zahlungsblock, für alle Dokumentversionen. Übernommen aus fortytools/ruby-secretariat (`dcf941f3`).
+
+### Geändert
+- **Geänderte Ausgabe:** Das XML beginnt jetzt mit `<?xml version="1.0" encoding="UTF-8"?>` und enthält Umlaute und Sonderzeichen direkt als UTF-8-Bytes statt als Zeichenreferenzen (`Fleethörn` statt `Fleeth&#xF6;rn`). Für XML-Parser ist das gleichwertig, die Bytes der Ausgabe ändern sich aber. Eingaben müssen in UTF-8 vorliegen; andere Kodierungen werden wie bisher zum Ersatzzeichen U+FFFD. Übernommen aus fortytools/ruby-secretariat (`19538c55`).
+- `to_xml` schreibt bei ungültigen Beträgen nichts mehr auf stdout (`puts`/`pp`); die Fehler stehen weiterhin in `ValidationError#errors`.
+
+### Korrigiert
+- `LineItem#valid?`: Eine Abweichung zwischen Brutto minus Rabatt und Nettopreis landet als Eintrag in `errors`, statt die Liste durch einen String zu ersetzen.
+- Ein leerer `discount_amount` (`""`) wird wie `nil` behandelt, statt in `valid?` mit `ArgumentError` abzubrechen.
+- Ein `payment_reference` aus Leerzeichen erzeugt kein leeres `PaymentReference`-Element.
 
 ## [2.2.2] - 2026-11-24
 

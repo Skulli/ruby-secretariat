@@ -28,6 +28,7 @@ module Secretariat
     :payment_iban,
     :payment_bic,
     :payment_account_name,
+    :payment_reference,
     :tax_category,
     :tax_percent,
     :tax_amount,
@@ -129,11 +130,10 @@ module Secretariat
       end
 
       if !skip_validation && !valid?
-        puts errors.inspect
         raise ValidationError.new("Invoice is invalid", errors)
       end
 
-      builder = Nokogiri::XML::Builder.new do |xml|
+      builder = Nokogiri::XML::Builder.new(encoding: "UTF-8") do |xml|
         root = by_version(version, "CrossIndustryDocument", "CrossIndustryInvoice")
 
         xml["rsm"].send(root, namespaces(version: version)) do
@@ -253,6 +253,7 @@ module Secretariat
             xml["ram"].send(trade_settlement) do
               # ZUGFeRD 1 kennt für Gläubiger-ID und Mandatsreferenz kein eigenes Element
               xml["ram"].CreditorReferenceID direct_debit_creditor_id if version >= 2
+              xml["ram"].PaymentReference payment_reference if payment_reference.to_s.strip != "" # BT-83, Verwendungszweck
               xml["ram"].InvoiceCurrencyCode currency_code
               xml["ram"].SpecifiedTradeSettlementPaymentMeans do
                 xml["ram"].TypeCode payment_code
@@ -355,7 +356,9 @@ module Secretariat
       builder.doc.traverse do |node|
         node.remove if node.element? && node.text == ""
       end
-      builder.to_xml
+      # Nicht-UTF-8-Eingaben landen als Rohbytes im XML; wie vor der UTF-8-Ausgabe
+      # werden sie zu U+FFFD, damit das Dokument wohlgeformt bleibt.
+      builder.to_xml.scrub("\uFFFD")
     end
   end
 end
