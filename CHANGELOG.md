@@ -1,9 +1,23 @@
 # Changelog
 
-## [2.3.0] - 2026-11-24
+## [2.4.0] - 2026-11-24
 
 ### Neu
 - Anhänge (BG-24, rechnungsbegründende Unterlagen) für ZUGFeRD 2.x und XRechnung: `Invoice#attachments` nimmt `Secretariat::Attachment`-Objekte (`filename`, `content` als Rohdaten, optional `description`) und bettet sie als `ram:AdditionalReferencedDocument` mit `TypeCode` 916 und Base64-kodiertem `AttachmentBinaryObject` ein. Der MIME-Typ ergibt sich aus der Dateiendung; zulässig sind die Typen der EN16931-Codeliste (BR-CL-24: PDF, PNG, JPEG, CSV, XLSX, ODS), andere führen ebenso wie doppelte Dateinamen (BR-DE-22) zu einem `ValidationError`; `Invoice#valid?`/`#errors` melden das bereits vorab. Mehrere Anhänge sind erlaubt (BG-24 ist 0..n), das EN16931-CII-Schematron gibt ab dem zweiten dann aber die Warnungen CII-SR-475/476 aus (Status bleibt gültig). Ohne `attachments` ändert sich die Ausgabe nicht. ZUGFeRD 1 (`version: 1`) kennt keine eingebetteten Anhänge — dort wird mit Anhängen ein Fehler geworfen.
+
+## [2.3.0] - 2026-11-24
+
+### Hinzugefügt
+- `Invoice#payment_reference`: Verwendungszweck (BT-83) als `PaymentReference` im Zahlungsblock, für alle Dokumentversionen. Übernommen aus fortytools/ruby-secretariat (`dcf941f3`).
+
+### Geändert
+- **Geänderte Ausgabe:** Das XML beginnt jetzt mit `<?xml version="1.0" encoding="UTF-8"?>` und enthält Umlaute und Sonderzeichen direkt als UTF-8-Bytes statt als Zeichenreferenzen (`Fleethörn` statt `Fleeth&#xF6;rn`). Für XML-Parser ist das gleichwertig, die Bytes der Ausgabe ändern sich aber. Eingaben müssen in UTF-8 vorliegen; andere Kodierungen werden wie bisher zum Ersatzzeichen U+FFFD. Übernommen aus fortytools/ruby-secretariat (`19538c55`).
+- `to_xml` schreibt bei ungültigen Beträgen nichts mehr auf stdout (`puts`/`pp`); die Fehler stehen weiterhin in `ValidationError#errors`.
+
+### Korrigiert
+- `LineItem#valid?`: Eine Abweichung zwischen Brutto minus Rabatt und Nettopreis landet als Eintrag in `errors`, statt die Liste durch einen String zu ersetzen.
+- Ein leerer `discount_amount` (`""`) wird wie `nil` behandelt, statt in `valid?` mit `ArgumentError` abzubrechen.
+- Ein `payment_reference` aus Leerzeichen erzeugt kein leeres `PaymentReference`-Element.
 
 ## [2.2.2] - 2026-11-24
 
