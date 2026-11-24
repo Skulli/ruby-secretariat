@@ -280,8 +280,17 @@ RSpec.describe Secretariat::Invoice do
       end
     end
 
-    # XRechnung verbietet das Empfängerkonto bei Code 59 (BR-DE-25-b), EN16931 nicht
-    it "hält die XSD-Reihenfolge Schuldner- vor Empfängerkonto ein" do
+    it "lässt in XRechnung das Empfängerkonto weg (BR-DE-25-b)" do
+      subject.payment_iban = "DE02120300000000202051"
+      subject.payment_bic = "BYLADEM1001"
+      doc = Nokogiri::XML(subject.to_xml(version: 3, mode: :xrechnung))
+      doc.remove_namespaces!
+      expect(doc.at_xpath("//PayeePartyCreditorFinancialAccount")).to be_nil
+      expect(doc.at_xpath("//PayeeSpecifiedCreditorFinancialInstitution")).to be_nil
+      expect(doc.at_xpath("//PayerPartyDebtorFinancialAccount/IBANID")&.text).to eq("DE21860000000086001055")
+    end
+
+    it "hält in ZUGFeRD die XSD-Reihenfolge Schuldner- vor Empfängerkonto ein" do
       subject.payment_iban = "DE02120300000000202051"
       xml = subject.to_xml(version: 3)
       expect(Secretariat::Validator.new(xml, version: 3).validate_against_schema).to be_empty

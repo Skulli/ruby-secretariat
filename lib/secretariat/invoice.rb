@@ -262,7 +262,8 @@ module Secretariat
                     xml["ram"].IBANID direct_debit_iban
                   end
                 end
-                if payment_iban && payment_iban != ""
+                # XRechnung verbietet bei Lastschrift das Empfängerkonto (BR-DE-25-b)
+                if payment_iban && payment_iban != "" && !(mode == :xrechnung && payment_code == "59")
                   xml["ram"].PayeePartyCreditorFinancialAccount do
                     xml["ram"].IBANID payment_iban
                     if payment_account_name.to_s != ""

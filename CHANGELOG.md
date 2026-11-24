@@ -5,7 +5,10 @@
 ### Neu
 - SEPA-Lastschrift (Zahlungsart 59, `payment_type: :SEPA_DEBIT`): neue Felder `direct_debit_mandate_reference_id` (Mandatsreferenz, BT-89 → `ram:DirectDebitMandateID`), `direct_debit_creditor_id` (Gläubiger-ID, BT-90 → `ram:CreditorReferenceID`) und `direct_debit_iban` (belastetes Konto, BT-91 → `ram:PayerPartyDebtorFinancialAccount/ram:IBANID`). Ohne Werte entfallen die Elemente; bestehende Rechnungen bleiben unverändert.
 - ZUGFeRD 1 (`version: 1`) hat für Mandatsreferenz und Gläubiger-ID kein eigenes Element; dort wird nur das belastete Konto ausgegeben.
-- Für XRechnung bei Code 59 Gläubiger-ID und Schuldner-IBAN angeben (BR-DE-30/31) und `payment_iban` leer lassen (BR-DE-25-b).
+- Für XRechnung bei Code 59 Gläubiger-ID und Schuldner-IBAN angeben (BR-DE-30/31).
+
+### Geändert
+- `mode: :xrechnung` mit Code 59 gibt das Empfängerkonto (`payment_iban`, `payment_bic`, `payment_account_name`) nicht mehr aus, weil XRechnung es bei Lastschrift verbietet (BR-DE-25-b). ZUGFeRD gibt es weiterhin aus.
 
 ## [2.2.2] - 2026-11-24
 
