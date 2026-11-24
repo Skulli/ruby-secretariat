@@ -47,6 +47,9 @@ module Secretariat
     :invoice_start,
     :invoice_end,
     :invoice_type,
+    :direct_debit_mandate_reference_id, # BT-89
+    :direct_debit_creditor_id, # BT-90
+    :direct_debit_iban, # BT-91
     keyword_init: true) do
     include Versioner
 
@@ -248,10 +251,17 @@ module Secretariat
             end
             trade_settlement = by_version(version, "ApplicableSupplyChainTradeSettlement", "ApplicableHeaderTradeSettlement")
             xml["ram"].send(trade_settlement) do
+              # ZUGFeRD 1 kennt für Gläubiger-ID und Mandatsreferenz kein eigenes Element
+              xml["ram"].CreditorReferenceID direct_debit_creditor_id if version >= 2
               xml["ram"].InvoiceCurrencyCode currency_code
               xml["ram"].SpecifiedTradeSettlementPaymentMeans do
                 xml["ram"].TypeCode payment_code
                 xml["ram"].Information payment_text
+                if direct_debit_iban.to_s != ""
+                  xml["ram"].PayerPartyDebtorFinancialAccount do
+                    xml["ram"].IBANID direct_debit_iban
+                  end
+                end
                 if payment_iban && payment_iban != ""
                   xml["ram"].PayeePartyCreditorFinancialAccount do
                     xml["ram"].IBANID payment_iban
@@ -305,6 +315,7 @@ module Secretariat
                 elsif payment_status.to_s != ""
                   xml["ram"].Description payment_status.capitalize
                 end
+                xml["ram"].DirectDebitMandateID direct_debit_mandate_reference_id if version >= 2
               end
 
               monetary_summation = by_version(version, "SpecifiedTradeSettlementMonetarySummation", "SpecifiedTradeSettlementHeaderMonetarySummation")

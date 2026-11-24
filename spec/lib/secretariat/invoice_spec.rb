@@ -238,4 +238,63 @@ RSpec.describe Secretariat::Invoice do
       expect(Secretariat::Validator.new(xml, version: 2).validate_against_schema).to be_empty
     end
   end
+
+  describe "SEPA-Lastschrift (BT-89 bis BT-91)" do
+    subject {
+      super().tap do |invoice|
+        invoice.payment_type = :SEPA_DEBIT
+        invoice.payment_text = "SEPA-Lastschrift"
+        invoice.direct_debit_mandate_reference_id = "MANDAT-0815"
+        invoice.direct_debit_creditor_id = "DE98ZZZ09999999999"
+        invoice.direct_debit_iban = "DE21860000000086001055"
+      end
+    }
+
+    def doc_for(version)
+      doc = Nokogiri::XML(subject.to_xml(version: version))
+      doc.remove_namespaces!
+      doc
+    end
+
+    it "gibt Mandatsreferenz, Gläubiger-ID und belastetes Konto aus" do
+      doc = doc_for(3)
+      settlement = doc.at_xpath("//ApplicableHeaderTradeSettlement")
+      expect(settlement.at_xpath("CreditorReferenceID")&.text).to eq("DE98ZZZ09999999999")
+      expect(settlement.at_xpath("SpecifiedTradePaymentTerms/DirectDebitMandateID")&.text).to eq("MANDAT-0815")
+      means = settlement.at_xpath("SpecifiedTradeSettlementPaymentMeans")
+      expect(means.at_xpath("TypeCode").text).to eq("59")
+      expect(means.at_xpath("PayerPartyDebtorFinancialAccount/IBANID")&.text).to eq("DE21860000000086001055")
+    end
+
+    it "gibt in ZUGFeRD 1 nur das belastete Konto aus (kein Element für BT-89/BT-90)" do
+      doc = doc_for(1)
+      expect(doc.at_xpath("//PayerPartyDebtorFinancialAccount/IBANID")&.text).to eq("DE21860000000086001055")
+      expect(doc.at_xpath("//CreditorReferenceID")).to be_nil
+      expect(doc.at_xpath("//DirectDebitMandateID")).to be_nil
+    end
+
+    [1, 2, 3].each do |version|
+      it "bleibt in Version #{version} schema-valide" do
+        xml = subject.to_xml(version: version)
+        expect(Secretariat::Validator.new(xml, version: version).validate_against_schema).to be_empty
+      end
+    end
+
+    # XRechnung verbietet das Empfängerkonto bei Code 59 (BR-DE-25-b), EN16931 nicht
+    it "hält die XSD-Reihenfolge Schuldner- vor Empfängerkonto ein" do
+      subject.payment_iban = "DE02120300000000202051"
+      xml = subject.to_xml(version: 3)
+      expect(Secretariat::Validator.new(xml, version: 3).validate_against_schema).to be_empty
+    end
+
+    it "lässt die Elemente ohne Werte weg" do
+      subject.direct_debit_mandate_reference_id = nil
+      subject.direct_debit_creditor_id = ""
+      subject.direct_debit_iban = nil
+      doc = doc_for(3)
+      %w[CreditorReferenceID DirectDebitMandateID PayerPartyDebtorFinancialAccount].each do |el|
+        expect(doc.at_xpath("//#{el}")).to be_nil, "#{el} darf ohne Wert nicht vorkommen"
+      end
+    end
+  end
 end
