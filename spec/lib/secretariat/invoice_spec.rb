@@ -239,6 +239,99 @@ RSpec.describe Secretariat::Invoice do
     end
   end
 
+  describe "Anhänge (BG-24)" do
+    let(:pdf) { File.binread(File.join(__dir__, "../../fixtures/zugferd_2/test_a1.pdf")) }
+    let(:attachment) {
+      Secretariat::Attachment.new(filename: "Leistungsnachweis.pdf", content: pdf, description: "Leistungsnachweis November")
+    }
+
+    subject {
+      super().tap { |invoice| invoice.attachments = [attachment] }
+    }
+
+    def referenced_document(xml)
+      doc = Nokogiri::XML(xml)
+      doc.remove_namespaces!
+      doc.at_xpath("//ApplicableHeaderTradeAgreement/AdditionalReferencedDocument")
+    end
+
+    it "bettet die Datei als AdditionalReferencedDocument mit TypeCode 916 ein" do
+      document = referenced_document(subject.to_xml(version: 3))
+      expect(document.at_xpath("IssuerAssignedID").text).to eq("Leistungsnachweis.pdf")
+      expect(document.at_xpath("TypeCode").text).to eq("916")
+      expect(document.at_xpath("Name").text).to eq("Leistungsnachweis November")
+      binary = document.at_xpath("AttachmentBinaryObject")
+      expect(binary["mimeCode"]).to eq("application/pdf")
+      expect(binary["filename"]).to eq("Leistungsnachweis.pdf")
+      expect(binary.text.unpack1("m0")).to eq(pdf)
+    end
+
+    it "lässt ohne Beschreibung den Namen weg" do
+      attachment.description = nil
+      expect(referenced_document(subject.to_xml(version: 3)).at_xpath("Name")).to be_nil
+    end
+
+    [[2, :zugferd], [3, :zugferd], [2, :xrechnung], [3, :xrechnung]].each do |version, mode|
+      it "bleibt schema-valide (version #{version}, #{mode})" do
+        xml = subject.to_xml(version: version, mode: mode)
+        expect(Secretariat::Validator.new(xml, version: version).validate_against_schema).to be_empty
+      end
+    end
+
+    it "gibt ohne Anhänge kein AdditionalReferencedDocument aus" do
+      subject.attachments = nil
+      expect(referenced_document(subject.to_xml(version: 3))).to be_nil
+    end
+
+    it "lehnt nicht zulässige Dateitypen ab" do
+      attachment.filename = "Leistungsnachweis.docx"
+      expect { subject.to_xml(version: 3) }.to raise_error(Secretariat::ValidationError) { |e|
+        expect(e.errors.first).to include("Leistungsnachweis.docx is not allowed")
+      }
+    end
+
+    it "lehnt leere Dateien ab" do
+      attachment.content = ""
+      expect { subject.to_xml(version: 3) }.to raise_error(Secretariat::ValidationError) { |e|
+        expect(e.errors).to eq(["Attachment 1: content is missing"])
+      }
+    end
+
+    it "meldet ungültige Anhänge schon über valid? und errors" do
+      attachment.filename = "Leistungsnachweis.docx"
+      expect(subject.valid?).to be(false)
+      expect(subject.errors.first).to start_with("Attachment 1: file type of Leistungsnachweis.docx")
+    end
+
+    it "lehnt doppelte Dateinamen ab (BR-DE-22)" do
+      subject.attachments = [attachment, attachment.dup]
+      expect(subject.valid?).to be(false)
+      expect(subject.errors).to eq(["Attachment filenames must be unique (BR-DE-22)"])
+    end
+
+    it "bettet mehrere Anhänge schema-valide ein" do
+      subject.attachments = [attachment, Secretariat::Attachment.new(filename: "Stundenliste.csv", content: "Datum;Stunden\n")]
+      xml = subject.to_xml(version: 3, mode: :xrechnung)
+      expect(Nokogiri::XML(xml).remove_namespaces!.xpath("//AdditionalReferencedDocument/AttachmentBinaryObject").map { |b| b["mimeCode"] })
+        .to eq(["application/pdf", "text/csv"])
+      expect(Secretariat::Validator.new(xml, version: 3).validate_against_schema).to be_empty
+    end
+
+    it "nimmt auch einen einzelnen Anhang ohne Array" do
+      subject.attachments = attachment
+      expect(referenced_document(subject.to_xml(version: 3)).at_xpath("IssuerAssignedID").text).to eq("Leistungsnachweis.pdf")
+    end
+
+    it "erkennt den MIME-Typ unabhängig von der Groß-/Kleinschreibung der Endung" do
+      attachment.filename = "Foto.JPG"
+      expect(attachment.mime_code).to eq("image/jpeg")
+    end
+
+    it "verweigert Anhänge für ZUGFeRD 1, das kein AttachmentBinaryObject kennt" do
+      expect { subject.to_xml(version: 1) }.to raise_error(/Attachments require Document Version > 1/)
+    end
+  end
+
   describe "Verwendungszweck (BT-83)" do
     def payment_reference(xml)
       doc = Nokogiri::XML(xml)

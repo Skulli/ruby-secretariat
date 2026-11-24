@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.4.0] - 2026-11-24
+
+### Neu
+- Anhänge (BG-24, rechnungsbegründende Unterlagen) für ZUGFeRD 2.x und XRechnung: `Invoice#attachments` nimmt `Secretariat::Attachment`-Objekte (`filename`, `content` als Rohdaten, optional `description`) und bettet sie als `ram:AdditionalReferencedDocument` mit `TypeCode` 916 und Base64-kodiertem `AttachmentBinaryObject` ein. Der MIME-Typ ergibt sich aus der Dateiendung; zulässig sind die Typen der EN16931-Codeliste (BR-CL-24: PDF, PNG, JPEG, CSV, XLSX, ODS), andere führen ebenso wie doppelte Dateinamen (BR-DE-22) zu einem `ValidationError`; `Invoice#valid?`/`#errors` melden das bereits vorab. Mehrere Anhänge sind erlaubt (BG-24 ist 0..n), das EN16931-CII-Schematron gibt ab dem zweiten dann aber die Warnungen CII-SR-475/476 aus (Status bleibt gültig). Ohne `attachments` ändert sich die Ausgabe nicht. ZUGFeRD 1 (`version: 1`) kennt keine eingebetteten Anhänge — dort wird mit Anhängen ein Fehler geworfen.
+
 ## [2.3.0] - 2026-11-24
 
 ### Hinzugefügt

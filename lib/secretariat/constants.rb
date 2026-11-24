@@ -15,6 +15,17 @@
 module Secretariat
   BASIS_QUANTITY = 1.0
 
+  # Für Anhänge (BG-24) zulässige MIME-Typen nach EN16931-Codeliste (BR-CL-24), je Dateiendung
+  ATTACHMENT_MIME_TYPES = {
+    "pdf" => "application/pdf",
+    "png" => "image/png",
+    "jpg" => "image/jpeg",
+    "jpeg" => "image/jpeg",
+    "csv" => "text/csv",
+    "xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "ods" => "application/vnd.oasis.opendocument.spreadsheet"
+  }
+
   TAX_CATEGORY_CODES = {
     STANDARDRATE: "S",
     REVERSECHARGE: "AE",

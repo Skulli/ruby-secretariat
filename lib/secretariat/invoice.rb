@@ -48,11 +48,17 @@ module Secretariat
     :invoice_start,
     :invoice_end,
     :invoice_type,
+    :attachments,
     keyword_init: true) do
     include Versioner
 
     def errors
       @errors
+    end
+
+    # erlaubt auch einen einzelnen Anhang ohne Array (Array() würde das Struct zerlegen)
+    def attachment_list
+      [attachments].flatten.compact
     end
 
     def tax_reason_text
@@ -93,6 +99,16 @@ module Secretariat
         @errors << "Line items do not add up to basis amount #{line_item_sum} / #{basis}"
         return false
       end
+      attachment_list.each_with_index do |attachment, i|
+        next if attachment.valid?
+        @errors.concat(attachment.errors.map { |error| "Attachment #{i + 1}: #{error}" })
+        return false
+      end
+      filenames = attachment_list.map(&:filename)
+      if filenames.uniq.size != filenames.size
+        @errors << "Attachment filenames must be unique (BR-DE-22)"
+        return false
+      end
       true
     end
 
@@ -124,6 +140,10 @@ module Secretariat
       end
       if mode == :xrechnung && version < 2
         raise "Mode XRechnung requires Document Version > 1"
+      end
+      # ZUGFeRD 1 kennt kein AttachmentBinaryObject
+      if version == 1 && attachment_list.any?
+        raise "Attachments require Document Version > 1"
       end
 
       if !skip_validation && !valid?
@@ -212,6 +232,7 @@ module Secretariat
               xml["ram"].BuyerTradeParty do
                 buyer.to_xml(xml, version: version)
               end
+              attachment_list.each { |attachment| attachment.to_xml(xml) }
 
               if project_id.to_s != "" || project_name.to_s != ""
                 xml["ram"].SpecifiedProcuringProject do
