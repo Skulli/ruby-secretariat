@@ -99,6 +99,8 @@ xml = invoice.to_xml(version: 2)                    # ZUGFeRD 2.x / Factur-X EN1
 
 `to_xml` prüft vorab die Betragskonsistenz (Steuer, Summen, Positionssummen) und wirft bei Abweichungen einen `Secretariat::ValidationError` mit Fehlerliste (`skip_validation: true` überspringt das). Leere XML-Knoten werden vor der Ausgabe entfernt. Weitere Beispiele in den Specs (`spec/lib/secretariat/`).
 
+**SEPA-Lastschrift** (`payment_type: :SEPA_DEBIT`, Code 59): statt `payment_iban`/`payment_bic` die Felder `direct_debit_creditor_id` (Gläubiger-ID, BT-90), `direct_debit_iban` (belastetes Konto, BT-91) und `direct_debit_mandate_reference_id` (Mandatsreferenz, BT-89) setzen. XRechnung verlangt Gläubiger-ID und Schuldner-IBAN (BR-DE-30/31) und verbietet bei Code 59 das Empfängerkonto (BR-DE-25-b); im Modus `:xrechnung` lässt das Gem `payment_iban`/`payment_bic` dann weg.
+
 ## Validierung
 
 ```ruby
