@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.2.3] - 2026-11-24
+
+### Hinzugefügt
+- `Invoice#payment_reference`: Verwendungszweck (BT-83) als `PaymentReference` im Zahlungsblock, für alle Dokumentversionen. Übernommen aus fortytools/ruby-secretariat (`dcf941f3`).
+
+### Geändert
+- Das XML deklariert jetzt `encoding="UTF-8"` und enthält Umlaute und Sonderzeichen direkt statt als Zeichenreferenzen (`Fleethörn` statt `Fleeth&#xF6;rn`). Inhaltlich gleichwertig, nur besser lesbar. Übernommen aus fortytools/ruby-secretariat (`19538c55`).
+
+### Korrigiert
+- `LineItem#valid?`: Eine Abweichung zwischen Brutto minus Rabatt und Nettopreis landet als Eintrag in `errors`, statt die Liste durch einen String zu ersetzen.
+
 ## [2.2.2] - 2026-11-24
 
 ### Geändert

@@ -28,6 +28,7 @@ module Secretariat
     :payment_iban,
     :payment_bic,
     :payment_account_name,
+    :payment_reference,
     :tax_category,
     :tax_percent,
     :tax_amount,
@@ -130,7 +131,7 @@ module Secretariat
         raise ValidationError.new("Invoice is invalid", errors)
       end
 
-      builder = Nokogiri::XML::Builder.new do |xml|
+      builder = Nokogiri::XML::Builder.new(encoding: "UTF-8") do |xml|
         root = by_version(version, "CrossIndustryDocument", "CrossIndustryInvoice")
 
         xml["rsm"].send(root, namespaces(version: version)) do
@@ -248,6 +249,7 @@ module Secretariat
             end
             trade_settlement = by_version(version, "ApplicableSupplyChainTradeSettlement", "ApplicableHeaderTradeSettlement")
             xml["ram"].send(trade_settlement) do
+              xml["ram"].PaymentReference payment_reference # BT-83, Verwendungszweck
               xml["ram"].InvoiceCurrencyCode currency_code
               xml["ram"].SpecifiedTradeSettlementPaymentMeans do
                 xml["ram"].TypeCode payment_code

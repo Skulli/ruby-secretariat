@@ -59,7 +59,7 @@ module Secretariat
         discount = BigDecimal(discount_amount)
         calculated_net_price = (gross_price - discount).round(2)
         if calculated_net_price != net_price
-          @errors = "Calculated net price and net price deviate: #{calculated_net_price} / #{net_price}"
+          @errors << "Calculated net price and net price deviate: #{calculated_net_price} / #{net_price}"
           return false
         end
       end

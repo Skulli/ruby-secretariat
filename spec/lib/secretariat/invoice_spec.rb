@@ -238,4 +238,45 @@ RSpec.describe Secretariat::Invoice do
       expect(Secretariat::Validator.new(xml, version: 2).validate_against_schema).to be_empty
     end
   end
+
+  describe "Verwendungszweck (BT-83)" do
+    def payment_reference(xml)
+      doc = Nokogiri::XML(xml)
+      doc.remove_namespaces!
+      doc.at_xpath("//ApplicableHeaderTradeSettlement/PaymentReference | //ApplicableSupplyChainTradeSettlement/PaymentReference")&.text
+    end
+
+    it "gibt payment_reference als PaymentReference aus" do
+      subject.payment_reference = "RE-12345"
+      expect(payment_reference(subject.to_xml(version: 3))).to eq("RE-12345")
+    end
+
+    it "bleibt in allen Versionen schema-valide" do
+      subject.payment_reference = "RE-12345"
+      [1, 2, 3].each do |version|
+        xml = subject.to_xml(version: version)
+        expect(Secretariat::Validator.new(xml, version: version).validate_against_schema).to be_empty
+      end
+    end
+
+    it "lässt das Element ohne payment_reference weg" do
+      expect(payment_reference(subject.to_xml(version: 3))).to be_nil
+    end
+  end
+
+  describe "Zeichenkodierung" do
+    before { seller.name = "Müller & Söhne GmbH" }
+
+    let(:xml) { subject.to_xml(version: 3) }
+
+    it "deklariert UTF-8 und schreibt Umlaute unmaskiert" do
+      expect(xml).to start_with('<?xml version="1.0" encoding="UTF-8"?>')
+      expect(xml).to include("Müller &amp; Söhne GmbH")
+      expect(xml.encoding).to eq(Encoding::UTF_8)
+    end
+
+    it "bleibt schema-valide" do
+      expect(Secretariat::Validator.new(xml, version: 3).validate_against_schema).to be_empty
+    end
+  end
 end
