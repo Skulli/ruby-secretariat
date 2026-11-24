@@ -96,7 +96,7 @@ xml = invoice.to_xml(version: 3, mode: :xrechnung)  # XRechnung 3.0
 xml = invoice.to_xml(version: 2)                    # ZUGFeRD 2.x / Factur-X EN16931
 ```
 
-Anhänge (BG-24, z. B. ein Leistungsnachweis) werden ab `version: 2` direkt ins XML eingebettet; erlaubt sind PDF, PNG, JPEG, CSV, XLSX und ODS (MIME-Typ aus der Dateiendung):
+Anhänge (BG-24, z. B. ein Leistungsnachweis) werden ab `version: 2` direkt ins XML eingebettet; erlaubt sind PDF, PNG, JPEG, CSV, XLSX und ODS (MIME-Typ aus der Dateiendung), Dateinamen müssen eindeutig sein. Ab dem zweiten Anhang warnt das EN16931-CII-Schematron (CII-SR-475/476), die Rechnung bleibt gültig:
 
 ```ruby
 invoice.attachments = [

@@ -38,11 +38,8 @@ module Secretariat
       @errors.empty?
     end
 
-    def to_xml(xml, attachment_index, skip_validation: false)
-      if !skip_validation && !valid?
-        raise ValidationError.new("Attachment #{attachment_index} is invalid", errors)
-      end
-
+    # Validierung über Invoice#valid?, das auch doppelte Dateinamen erkennt
+    def to_xml(xml)
       xml["ram"].AdditionalReferencedDocument do
         xml["ram"].IssuerAssignedID filename
         xml["ram"].TypeCode "916" # Rechnungsbegründende Unterlage

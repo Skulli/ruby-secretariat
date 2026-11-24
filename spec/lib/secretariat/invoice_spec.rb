@@ -293,8 +293,33 @@ RSpec.describe Secretariat::Invoice do
     it "lehnt leere Dateien ab" do
       attachment.content = ""
       expect { subject.to_xml(version: 3) }.to raise_error(Secretariat::ValidationError) { |e|
-        expect(e.errors).to eq(["content is missing"])
+        expect(e.errors).to eq(["Attachment 1: content is missing"])
       }
+    end
+
+    it "meldet ungültige Anhänge schon über valid? und errors" do
+      attachment.filename = "Leistungsnachweis.docx"
+      expect(subject.valid?).to be(false)
+      expect(subject.errors.first).to start_with("Attachment 1: file type of Leistungsnachweis.docx")
+    end
+
+    it "lehnt doppelte Dateinamen ab (BR-DE-22)" do
+      subject.attachments = [attachment, attachment.dup]
+      expect(subject.valid?).to be(false)
+      expect(subject.errors).to eq(["Attachment filenames must be unique (BR-DE-22)"])
+    end
+
+    it "bettet mehrere Anhänge schema-valide ein" do
+      subject.attachments = [attachment, Secretariat::Attachment.new(filename: "Stundenliste.csv", content: "Datum;Stunden\n")]
+      xml = subject.to_xml(version: 3, mode: :xrechnung)
+      expect(Nokogiri::XML(xml).remove_namespaces!.xpath("//AdditionalReferencedDocument/AttachmentBinaryObject").map { |b| b["mimeCode"] })
+        .to eq(["application/pdf", "text/csv"])
+      expect(Secretariat::Validator.new(xml, version: 3).validate_against_schema).to be_empty
+    end
+
+    it "nimmt auch einen einzelnen Anhang ohne Array" do
+      subject.attachments = attachment
+      expect(referenced_document(subject.to_xml(version: 3)).at_xpath("IssuerAssignedID").text).to eq("Leistungsnachweis.pdf")
     end
 
     it "erkennt den MIME-Typ unabhängig von der Groß-/Kleinschreibung der Endung" do
