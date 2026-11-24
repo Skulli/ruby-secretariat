@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.2.2] - 2026-11-24
+
+### Geändert
+- Mustang-CLI 2.25.0 → 2.26.0. Die CLI-Validierung prüft XRechnungen jetzt gegen das EN16931-Schematron 1.3.16 (vorher 1.3.15), das für CII strenger ist (u. a. Zahlungsart BT-81..83, BT-123/BT-128, Summenblock, Zu- und Abschläge). ZUGFeRD-Rechnungen prüft Mustang weiter mit den unveränderten FeRD-Regeln. Die Schemas und der Validator des Gems sind nicht betroffen.
+
 ## [2.2.1] - 2026-09-19
 
 ### Geändert
