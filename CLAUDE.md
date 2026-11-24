@@ -18,7 +18,7 @@ bundle exec standardrb   # Code-Style (Pflicht vor Commit, CI prüft)
 Manuelle End-to-End-Validierung eines erzeugten XML/PDF (Regelwerk wird per Guideline-URN automatisch erkannt):
 
 ```sh
-java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.25.0.jar --no-notices --action validate --source <datei>
+java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.26.0.jar --no-notices --action validate --source <datei>
 ```
 
 ## Architektur

@@ -111,7 +111,7 @@ validator.validate_against_schematron  # EN16931-Schematron (siehe Hinweis)
 - Die **KoSIT-XRechnung-Regeln (BR-DE-*) sind nicht enthalten** — `mode: :xrechnung` ist ein Generator-Modus, kein Validierungsprofil. Für eine vollständige Prüfung eignet sich die mitgelieferte Mustang-CLI:
 
 ```sh
-java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.25.0.jar \
+java -jar lib/secretariat/export/bin/jar/Mustang-CLI-2.26.0.jar \
   --no-notices --action validate --source rechnung.xml
 ```
 
