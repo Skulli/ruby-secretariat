@@ -10,3 +10,8 @@
 ## GitHub-Workflow (2026-08)
 
 - `gh pr create` wählt bei Fork-Repos standardmäßig das **Upstream-Repo** (fortytools) als Base — PRs hier immer explizit mit `--repo Skulli/ruby-secretariat` erstellen (passiert bei PR #10: erst versehentlich fortytools#18 erstellt, geschlossen, neu erstellt).
+
+## XML-Ausgabe und Versionierung (2026-11, PR #17)
+
+- `Nokogiri::XML::Builder.new(encoding: "UTF-8")` schreibt Strings in anderer Kodierung (ISO-8859-1, BINARY, kaputtes UTF-8) als Rohbytes ins XML, das dann nicht mehr wohlgeformt ist. Ohne `encoding:` kam `&#xFFFD;` heraus. Wer die Ausgabe-Kodierung ändert, prüft auch Eingaben, die nicht UTF-8 sind (Abhilfe hier: `scrub("�")` am Ende von `to_xml`).
+- Ein neues Feature oder eine geänderte Ausgabe bedeutet einen Minor-Bump, keinen Patch. Eine Änderung an den Bytes der Ausgabe steht im CHANGELOG als Verhaltensänderung, auch wenn sie für XML-Parser keinen Unterschied macht, denn symdok folgt direkt `main`.

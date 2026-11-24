@@ -238,4 +238,66 @@ RSpec.describe Secretariat::Invoice do
       expect(Secretariat::Validator.new(xml, version: 2).validate_against_schema).to be_empty
     end
   end
+
+  describe "Verwendungszweck (BT-83)" do
+    def payment_reference(xml)
+      doc = Nokogiri::XML(xml)
+      doc.remove_namespaces!
+      doc.at_xpath("//ApplicableHeaderTradeSettlement/PaymentReference | //ApplicableSupplyChainTradeSettlement/PaymentReference")&.text
+    end
+
+    it "gibt payment_reference als PaymentReference aus" do
+      subject.payment_reference = "RE-12345"
+      expect(payment_reference(subject.to_xml(version: 3))).to eq("RE-12345")
+    end
+
+    it "bleibt in allen Versionen schema-valide" do
+      subject.payment_reference = "RE-12345"
+      [1, 2, 3].each do |version|
+        xml = subject.to_xml(version: version)
+        expect(Secretariat::Validator.new(xml, version: version).validate_against_schema).to be_empty
+      end
+    end
+
+    it "lässt das Element ohne payment_reference weg" do
+      expect(payment_reference(subject.to_xml(version: 3))).to be_nil
+    end
+
+    it "lässt das Element bei reinen Leerzeichen weg" do
+      subject.payment_reference = "   "
+      expect(payment_reference(subject.to_xml(version: 3))).to be_nil
+    end
+  end
+
+  describe "Betragsfehler" do
+    it "schreibt nichts auf stdout und nennt die Fehler in der Exception" do
+      subject.tax_amount = "1"
+      expect {
+        expect { subject.to_xml(version: 3) }
+          .to raise_error(Secretariat::ValidationError) { |e| expect(e.errors.first).to start_with("Tax amount") }
+      }.not_to output.to_stdout
+    end
+  end
+
+  describe "Zeichenkodierung" do
+    before { seller.name = "Müller & Söhne GmbH" }
+
+    let(:xml) { subject.to_xml(version: 3) }
+
+    it "deklariert UTF-8 und schreibt Umlaute unmaskiert" do
+      expect(xml).to start_with('<?xml version="1.0" encoding="UTF-8"?>')
+      expect(xml).to include("Müller &amp; Söhne GmbH")
+      expect(xml.encoding).to eq(Encoding::UTF_8)
+    end
+
+    it "bleibt schema-valide" do
+      expect(Secretariat::Validator.new(xml, version: 3).validate_against_schema).to be_empty
+    end
+
+    it "ersetzt Bytes aus Nicht-UTF-8-Eingaben durch U+FFFD statt ungültiges UTF-8 zu liefern" do
+      seller.name = "Fleeth\xF6rn GmbH".b.force_encoding("ISO-8859-1")
+      expect(xml.valid_encoding?).to be(true)
+      expect(xml).to include("Fleeth�rn GmbH")
+    end
+  end
 end
