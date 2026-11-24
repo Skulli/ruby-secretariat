@@ -20,6 +20,7 @@ require_relative "secretariat/validation_error"
 require_relative "secretariat/invoice"
 require_relative "secretariat/trade_party"
 require_relative "secretariat/line_item"
+require_relative "secretariat/attachment"
 require_relative "secretariat/validator"
 
 module Secretariat

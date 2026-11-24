@@ -47,6 +47,7 @@ module Secretariat
     :invoice_start,
     :invoice_end,
     :invoice_type,
+    :attachments,
     keyword_init: true) do
     include Versioner
 
@@ -123,6 +124,10 @@ module Secretariat
       end
       if mode == :xrechnung && version < 2
         raise "Mode XRechnung requires Document Version > 1"
+      end
+      # ZUGFeRD 1 kennt kein AttachmentBinaryObject
+      if version == 1 && Array(attachments).any?
+        raise "Attachments require Document Version > 1"
       end
 
       if !skip_validation && !valid?
@@ -211,6 +216,9 @@ module Secretariat
               end
               xml["ram"].BuyerTradeParty do
                 buyer.to_xml(xml, version: version)
+              end
+              Array(attachments).each_with_index do |attachment, i|
+                attachment.to_xml(xml, i + 1, skip_validation: skip_validation)
               end
 
               if project_id.to_s != "" || project_name.to_s != ""
