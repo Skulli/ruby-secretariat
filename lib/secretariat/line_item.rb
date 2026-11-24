@@ -55,7 +55,7 @@ module Secretariat
         @errors << "charge price and gross price times quantity deviate: #{charge_price} / #{unit_price}"
         return false
       end
-      if discount_amount
+      if discount_amount.to_s != ""
         discount = BigDecimal(discount_amount)
         calculated_net_price = (gross_price - discount).round(2)
         if calculated_net_price != net_price
@@ -86,7 +86,6 @@ module Secretariat
 
     def to_xml(xml, line_item_index, version: 2, skip_validation: false)
       if !skip_validation && !valid?
-        pp errors
         raise ValidationError.new("LineItem #{line_item_index} is invalid", errors)
       end
 
@@ -113,7 +112,7 @@ module Secretariat
         xml["ram"].send(agreement) do
           xml["ram"].GrossPriceProductTradePrice do
             Helpers.currency_element(xml, "ram", "ChargeAmount", gross_amount, currency_code, add_currency: version == 1, digits: 4)
-            if version >= 2 && discount_amount
+            if version >= 2 && discount_amount.to_s != ""
               xml["ram"].BasisQuantity(unitCode: unit_code) do
                 xml.text(Helpers.format(BASIS_QUANTITY, digits: 4))
               end
@@ -125,7 +124,7 @@ module Secretariat
                 xml["ram"].Reason discount_reason
               end
             end
-            if version == 1 && discount_amount
+            if version == 1 && discount_amount.to_s != ""
               xml["ram"].AppliedTradeAllowanceCharge do
                 xml["ram"].ChargeIndicator do
                   xml["udt"].Indicator "false"

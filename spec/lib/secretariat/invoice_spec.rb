@@ -262,6 +262,21 @@ RSpec.describe Secretariat::Invoice do
     it "lässt das Element ohne payment_reference weg" do
       expect(payment_reference(subject.to_xml(version: 3))).to be_nil
     end
+
+    it "lässt das Element bei reinen Leerzeichen weg" do
+      subject.payment_reference = "   "
+      expect(payment_reference(subject.to_xml(version: 3))).to be_nil
+    end
+  end
+
+  describe "Betragsfehler" do
+    it "schreibt nichts auf stdout und nennt die Fehler in der Exception" do
+      subject.tax_amount = "1"
+      expect {
+        expect { subject.to_xml(version: 3) }
+          .to raise_error(Secretariat::ValidationError) { |e| expect(e.errors.first).to start_with("Tax amount") }
+      }.not_to output.to_stdout
+    end
   end
 
   describe "Zeichenkodierung" do
@@ -277,6 +292,12 @@ RSpec.describe Secretariat::Invoice do
 
     it "bleibt schema-valide" do
       expect(Secretariat::Validator.new(xml, version: 3).validate_against_schema).to be_empty
+    end
+
+    it "ersetzt Bytes aus Nicht-UTF-8-Eingaben durch U+FFFD statt ungültiges UTF-8 zu liefern" do
+      seller.name = "Fleeth\xF6rn GmbH".b.force_encoding("ISO-8859-1")
+      expect(xml.valid_encoding?).to be(true)
+      expect(xml).to include("Fleeth�rn GmbH")
     end
   end
 end

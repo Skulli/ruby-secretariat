@@ -127,7 +127,6 @@ module Secretariat
       end
 
       if !skip_validation && !valid?
-        puts errors.inspect
         raise ValidationError.new("Invoice is invalid", errors)
       end
 
@@ -249,7 +248,7 @@ module Secretariat
             end
             trade_settlement = by_version(version, "ApplicableSupplyChainTradeSettlement", "ApplicableHeaderTradeSettlement")
             xml["ram"].send(trade_settlement) do
-              xml["ram"].PaymentReference payment_reference # BT-83, Verwendungszweck
+              xml["ram"].PaymentReference payment_reference if payment_reference.to_s.strip != "" # BT-83, Verwendungszweck
               xml["ram"].InvoiceCurrencyCode currency_code
               xml["ram"].SpecifiedTradeSettlementPaymentMeans do
                 xml["ram"].TypeCode payment_code
@@ -345,7 +344,9 @@ module Secretariat
       builder.doc.traverse do |node|
         node.remove if node.element? && node.text == ""
       end
-      builder.to_xml
+      # Nicht-UTF-8-Eingaben landen als Rohbytes im XML; wie vor der UTF-8-Ausgabe
+      # werden sie zu U+FFFD, damit das Dokument wohlgeformt bleibt.
+      builder.to_xml.scrub("\uFFFD")
     end
   end
 end

@@ -80,6 +80,7 @@ invoice = Secretariat::Invoice.new(
   payment_iban: "DE02120300000000202051",
   payment_bic: "BYLADEM1001",
   payment_account_name: "Muster GmbH",
+  payment_reference: "RE-2026-0001",   # Verwendungszweck (BT-83)
   payment_due_date: Date.today + 14,    # Pflicht bei offenem Betrag (BR-CO-25)
   tax_category: :STANDARDRATE,
   tax_percent: "19",
